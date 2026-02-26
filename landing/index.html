@@ -698,6 +698,128 @@
       background: linear-gradient(90deg, var(--z8), var(--z6));
       -webkit-background-clip: text; -webkit-text-fill-color: transparent;
     }
+
+    /* ── Battle de Nomes ─────────────────────────────────────── */
+    #battle-section { padding: 80px 0; }
+    .battle-header { text-align: center; margin-bottom: 48px; }
+    .battle-header h2 {
+      font-family: 'Space Mono', monospace;
+      font-size: clamp(1.4rem, 3vw, 2rem);
+      font-weight: 700; letter-spacing: 3px;
+      background: linear-gradient(90deg, #ef4444, #f97316, #eab308);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .battle-header p { color: var(--muted); font-size: 0.9rem; margin-top: 8px; }
+
+    .battle-grid {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 24px;
+      align-items: start;
+    }
+    @media (max-width: 768px) { .battle-grid { grid-template-columns: 1fr; } }
+
+    /* Caixa de sugestão */
+    .battle-suggest {
+      background: rgba(239,68,68,0.05);
+      border: 1px solid rgba(239,68,68,0.2);
+      border-radius: 12px; padding: 24px;
+    }
+    .battle-suggest-title {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.7rem; letter-spacing: 2px; color: #ef4444; margin-bottom: 16px;
+    }
+    .battle-input {
+      width: 100%; padding: 12px 14px; margin-bottom: 10px;
+      background: rgba(255,255,255,0.04); border: 1px solid var(--border);
+      border-radius: 8px; color: var(--text); font-family: 'Inter', sans-serif;
+      font-size: 0.9rem; outline: none; transition: border-color 0.2s;
+    }
+    .battle-input:focus { border-color: rgba(239,68,68,0.5); }
+    .battle-input::placeholder { color: var(--muted); }
+    .battle-submit {
+      width: 100%; padding: 11px; background: rgba(239,68,68,0.12);
+      border: 1px solid rgba(239,68,68,0.3); border-radius: 8px;
+      color: #ef4444; font-family: 'Space Mono', monospace;
+      font-size: 0.72rem; letter-spacing: 1px; cursor: pointer; transition: all 0.2s;
+    }
+    .battle-submit:hover { background: rgba(239,68,68,0.2); }
+
+    /* Ranking lateral */
+    .battle-ranking-title {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.65rem; letter-spacing: 2px; color: var(--muted);
+      margin-top: 24px; margin-bottom: 12px;
+    }
+    .rank-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 8px 0; border-bottom: 1px solid var(--border);
+      font-size: 0.85rem;
+    }
+    .rank-item:last-child { border-bottom: none; }
+    .rank-pos { font-family: 'Space Mono', monospace; font-size: 0.75rem; min-width: 28px; color: var(--muted); }
+    .rank-nome { flex: 1; color: var(--text); font-weight: 500; }
+    .rank-wins { font-family: 'Space Mono', monospace; font-size: 0.7rem; color: #f97316; }
+    .battle-rank-empty { color: var(--muted); font-size: 0.8rem; padding: 8px 0; }
+
+    /* Arena */
+    .battle-arena-wrap {
+      background: rgba(0,0,0,0.3);
+      border: 1px solid var(--border);
+      border-radius: 12px; padding: 32px 24px;
+      min-height: 240px; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+    }
+    .battle-cards {
+      display: flex; align-items: center; gap: 20px; width: 100%;
+    }
+    .battle-card {
+      flex: 1; padding: 28px 16px;
+      background: rgba(255,255,255,0.03);
+      border: 2px solid var(--border); border-radius: 12px;
+      cursor: pointer; transition: all 0.25s;
+      display: flex; flex-direction: column; align-items: center; gap: 10px;
+    }
+    .battle-card:hover {
+      border-color: rgba(249,115,22,0.6);
+      background: rgba(249,115,22,0.06);
+      transform: scale(1.03);
+    }
+    .battle-card-nome {
+      font-family: 'Space Mono', monospace;
+      font-size: clamp(1rem, 2.5vw, 1.4rem);
+      font-weight: 700; color: var(--text); text-align: center;
+    }
+    .battle-card-wins { font-size: 0.72rem; color: var(--muted); }
+    .battle-vs {
+      font-family: 'Space Mono', monospace;
+      font-size: 1.4rem; font-weight: 700;
+      background: linear-gradient(135deg, #ef4444, #f97316);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      flex-shrink: 0; animation: pulse-vs 1.5s ease-in-out infinite;
+    }
+    @keyframes pulse-vs {
+      0%,100% { opacity: 1; transform: scale(1); }
+      50%      { opacity: 0.7; transform: scale(1.15); }
+    }
+    .battle-card.battle-winner {
+      border-color: #22c55e !important;
+      background: rgba(34,197,94,0.12) !important;
+      transform: scale(1.06) !important;
+    }
+    .battle-card.battle-loser {
+      opacity: 0.25; transform: scale(0.95) !important;
+    }
+    .battle-msg { color: var(--muted); font-size: 0.9rem; text-align: center; }
+    .battle-result-msg {
+      margin-top: 16px; font-family: 'Space Mono', monospace;
+      font-size: 0.75rem; color: #22c55e; letter-spacing: 1px;
+      opacity: 0; animation: fadeInOut 1.2s ease forwards;
+    }
+    @keyframes fadeInOut {
+      0% { opacity: 0; } 20% { opacity: 1; } 80% { opacity: 1; } 100% { opacity: 0; }
+    }
+
   </style>
 </head>
 <body>
@@ -1124,6 +1246,41 @@
       </div>
     </div>
 
+  </section>
+
+  <!-- ── Battle de Nomes ──────────────────────────────────────── -->
+  <section id="battle-section">
+    <div class="container">
+      <div class="battle-header">
+        <h2>⚔️ BATTLE DE NOMES</h2>
+        <p>Sugira um nome para o projeto. Vote no seu favorito — dois a dois, até sobrar o campeão.</p>
+      </div>
+
+      <div class="battle-grid">
+
+        <!-- Caixa de sugestão + Ranking -->
+        <div>
+          <div class="battle-suggest hud">
+            <div class="battle-suggest-title">💡 SUGIRA UM NOME</div>
+            <input class="battle-input" id="nome-input" maxlength="40"
+                   placeholder="ex: Nexus, Orion, AIOS..."
+                   onkeydown="if(event.key==='Enter') sugerirNome()" />
+            <button class="battle-submit" onclick="sugerirNome()">ENVIAR SUGESTÃO ⚡</button>
+          </div>
+
+          <div class="battle-ranking-title">🏆 PLACAR</div>
+          <div id="battle-ranking">
+            <p class="battle-rank-empty">Nenhum nome ainda.</p>
+          </div>
+        </div>
+
+        <!-- Arena de batalha -->
+        <div class="battle-arena-wrap hud" id="battle-arena">
+          <p class="battle-msg">Carregando batalha...</p>
+        </div>
+
+      </div>
+    </div>
   </section>
 
 </div>
@@ -1643,6 +1800,109 @@
     replyingTo = null;
     document.getElementById('reply-bar').classList.remove('on');
   });
+
+  // ── Battle de Nomes ──────────────────────────────────────────
+  let batalhasVotadas = JSON.parse(localStorage.getItem('battle_votos') || '[]');
+
+  function parKey(a, b) { return [String(a), String(b)].sort().join('|'); }
+
+  function renderRankingNomes(nomes) {
+    const el = document.getElementById('battle-ranking');
+    if (!nomes || nomes.length === 0) {
+      el.innerHTML = '<p class="battle-rank-empty">Nenhum nome sugerido ainda.</p>';
+      return;
+    }
+    el.innerHTML = nomes.map((n, i) => `
+      <div class="rank-item">
+        <span class="rank-pos">${i === 0 ? '👑' : '#' + (i + 1)}</span>
+        <span class="rank-nome">${n.nome}</span>
+        <span class="rank-wins">${n.vitorias}v</span>
+      </div>`).join('');
+  }
+
+  function renderBattle(a, b) {
+    document.getElementById('battle-arena').innerHTML = `
+      <div class="battle-cards">
+        <button class="battle-card" id="battle-a" onclick="votarBattle('${a.id}','${b.id}','a',${a.vitorias})">
+          <div class="battle-card-nome">${a.nome}</div>
+          <div class="battle-card-wins">⚔️ ${a.vitorias} vitórias</div>
+        </button>
+        <div class="battle-vs">VS</div>
+        <button class="battle-card" id="battle-b" onclick="votarBattle('${b.id}','${a.id}','b',${b.vitorias})">
+          <div class="battle-card-nome">${b.nome}</div>
+          <div class="battle-card-wins">⚔️ ${b.vitorias} vitórias</div>
+        </button>
+      </div>`;
+  }
+
+  async function proxBatalha() {
+    const { data: nomes } = await db.from('nome_sugestoes').select('*').order('vitorias', { ascending: false });
+    renderRankingNomes(nomes || []);
+
+    if (!nomes || nomes.length < 2) {
+      document.getElementById('battle-arena').innerHTML =
+        '<p class="battle-msg">Adicione pelo menos 2 nomes para começar a batalha! 👆</p>';
+      return;
+    }
+
+    const shuffled = [...nomes].sort(() => Math.random() - 0.5);
+    let par = null;
+    outer: for (let i = 0; i < shuffled.length; i++) {
+      for (let j = i + 1; j < shuffled.length; j++) {
+        if (!batalhasVotadas.includes(parKey(shuffled[i].id, shuffled[j].id))) {
+          par = [shuffled[i], shuffled[j]];
+          break outer;
+        }
+      }
+    }
+    if (!par) {
+      batalhasVotadas = [];
+      localStorage.setItem('battle_votos', '[]');
+      par = [shuffled[0], shuffled[1]];
+    }
+    renderBattle(par[0], par[1]);
+  }
+
+  async function votarBattle(vencedorId, perdedorId, lado, vitorias) {
+    const vBtn = document.getElementById('battle-' + lado);
+    const pBtn = document.getElementById('battle-' + (lado === 'a' ? 'b' : 'a'));
+    if (!vBtn || !pBtn) return;
+
+    // Bloqueia cliques duplos
+    vBtn.onclick = null; pBtn.onclick = null;
+
+    vBtn.classList.add('battle-winner');
+    pBtn.classList.add('battle-loser');
+
+    const key = parKey(vencedorId, perdedorId);
+    batalhasVotadas.push(key);
+    localStorage.setItem('battle_votos', JSON.stringify(batalhasVotadas));
+
+    await db.from('nome_sugestoes').update({ vitorias: vitorias + 1 }).eq('id', vencedorId);
+
+    const msg = document.createElement('p');
+    msg.className = 'battle-result-msg';
+    msg.textContent = '🏆 AVANÇA PARA A PRÓXIMA!';
+    document.getElementById('battle-arena').appendChild(msg);
+
+    setTimeout(() => proxBatalha(), 1300);
+  }
+
+  async function sugerirNome() {
+    const input = document.getElementById('nome-input');
+    const nome = input.value.trim();
+    if (!nome) return;
+    const { error } = await db.from('nome_sugestoes')
+      .insert([{ nome, sugerido_por: nomeUsuario() || 'Anônimo' }]);
+    if (error) {
+      mostrarErro(error.code === '23505' ? 'Esse nome já foi sugerido!' : 'Erro: ' + error.message);
+      return;
+    }
+    input.value = '';
+    proxBatalha();
+  }
+
+  proxBatalha();
 
   // ── Retorno por email ────────────────────────────────────────
   document.getElementById('btn-retorno').addEventListener('click', async () => {
