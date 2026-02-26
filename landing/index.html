@@ -1332,14 +1332,18 @@
 
   function parseTS(ts) {
     if (!ts) return new Date(NaN);
-    // Remove microsegundos, normaliza espaço→T e +00→+00:00
-    const s = String(ts)
-      .replace(' ', 'T')
-      .replace(/\.\d+/, '')
-      .replace(/\+00$/, '+00:00');
-    // Se não tem fuso explícito, assume UTC
-    const norm = (s.includes('+') || s.endsWith('Z')) ? s : s + 'Z';
-    return new Date(norm);
+    const s = String(ts).replace(' ', 'T');
+    // Extrai partes: "2026-02-26T11:43:35.827325+00:00"
+    const m = s.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})/);
+    if (!m) return new Date(NaN);
+    // Offset do fuso no timestamp (ex: +00:00, -03:00, Z = +00:00)
+    const tz = s.match(/([+-])(\d{2}):(\d{2})$/);
+    const offsetMin = tz
+      ? (tz[1] === '+' ? 1 : -1) * (parseInt(tz[2]) * 60 + parseInt(tz[3]))
+      : 0; // sem fuso = assume UTC
+    // Monta timestamp UTC corretamente
+    const utcMs = Date.UTC(+m[1], +m[2]-1, +m[3], +m[4], +m[5], +m[6]) - offsetMin * 60000;
+    return new Date(utcMs);
   }
 
   function tempoRelativo(ts) {
