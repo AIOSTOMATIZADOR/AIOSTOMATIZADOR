@@ -4,24 +4,27 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AIOSTOMATIZADOR — A fábrica de execução com Jarvis</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --red:     #ef4444;
-      --orange:  #f97316;
-      --amber:   #f59e0b;
-      --violet:  #7c3aed;
-      --violet2: #a855f7;
-      --cyan:    #06b6d4;
-      --emerald: #10b981;
-      --bg:      #050508;
-      --card:    rgba(255,255,255,0.04);
-      --border:  rgba(255,255,255,0.07);
-      --text:    #f1f5f9;
-      --muted:   #94a3b8;
+      --bg:        #020814;
+      --bg2:       #050d1a;
+      --text:      #e2e8f0;
+      --muted:     #64748b;
+      --border:    rgba(0,212,255,0.12);
+
+      /* Zonas de Genialidade */
+      --z1: #ef4444;  /* Estrategista   */
+      --z2: #f97316;  /* Criativo       */
+      --z3: #eab308;  /* Comunicador    */
+      --z4: #22c55e;  /* Construtor     */
+      --z5: #3b82f6;  /* Analista       */
+      --z6: #a855f7;  /* Visionário     */
+      --z7: #ec4899;  /* Conector       */
+      --z8: #06b6d4;  /* Executor       */
     }
 
     html { scroll-behavior: smooth; }
@@ -30,241 +33,482 @@
       background: var(--bg);
       color: var(--text);
       overflow-x: hidden;
-      line-height: 1.6;
+      min-height: 100vh;
     }
 
-    /* ── Fundo animado ── */
-    .bg-orbs { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+    /* ── Hex grid background ───────────────────────────────── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='104'%3E%3Cpath d='M30 2 L58 18 L58 50 L30 66 L2 50 L2 18 Z' fill='none' stroke='rgba(0,212,255,0.06)' stroke-width='1'/%3E%3Cpath d='M30 68 L58 84 L58 104' fill='none' stroke='rgba(0,212,255,0.06)' stroke-width='1'/%3E%3Cpath d='M30 68 L2 84 L2 104' fill='none' stroke='rgba(0,212,255,0.06)' stroke-width='1'/%3E%3C/svg%3E");
+      background-size: 60px 104px;
+      opacity: 1;
+    }
+
+    /* ── Prismatic orbs ────────────────────────────────────── */
+    .orbs { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
     .orb {
-      position: absolute; border-radius: 50%; filter: blur(120px); opacity: 0.15;
-      animation: float 14s ease-in-out infinite;
+      position: absolute; border-radius: 50%;
+      filter: blur(140px); opacity: 0.12;
+      animation: drift 18s ease-in-out infinite;
     }
-    .orb-1 { width: 700px; height: 700px; background: var(--violet);  top: -250px; left: -150px; animation-delay: 0s; }
-    .orb-2 { width: 500px; height: 500px; background: var(--red);     top: 50%;   right: -100px; animation-delay: 5s; }
-    .orb-3 { width: 450px; height: 450px; background: var(--amber);   bottom: -100px; left: 25%; animation-delay: 9s; }
-
-    @keyframes float {
+    .orb-1 { width:500px;height:500px; background:var(--z6); top:-150px;  left:-100px;  animation-delay:0s;  }
+    .orb-2 { width:400px;height:400px; background:var(--z8); top:40%;     right:-80px;  animation-delay:6s;  }
+    .orb-3 { width:350px;height:350px; background:var(--z4); bottom:-80px;left:30%;     animation-delay:12s; }
+    .orb-4 { width:300px;height:300px; background:var(--z2); top:20%;     left:40%;     animation-delay:3s;  }
+    @keyframes drift {
       0%,100% { transform: translateY(0) scale(1); }
-      50%      { transform: translateY(-40px) scale(1.06); }
+      50%      { transform: translateY(-35px) scale(1.08); }
     }
 
-    /* ── Layout ── */
-    .container { max-width: 920px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
+    /* ── Boot screen ───────────────────────────────────────── */
+    #boot {
+      position: fixed; inset: 0; z-index: 9999;
+      background: var(--bg);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 12px;
+      transition: opacity 0.8s ease;
+    }
+    #boot.fade { opacity: 0; pointer-events: none; }
+    .boot-logo {
+      font-family: 'Space Mono', monospace;
+      font-size: clamp(1rem, 3vw, 1.4rem);
+      font-weight: 700; letter-spacing: 4px;
+      background: linear-gradient(90deg, var(--z8), var(--z6), var(--z7));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      margin-bottom: 24px;
+    }
+    .boot-line {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.75rem; color: var(--z8);
+      opacity: 0; transform: translateX(-10px);
+      transition: opacity 0.3s, transform 0.3s;
+    }
+    .boot-line.on { opacity: 1; transform: translateX(0); }
+    .boot-bar {
+      width: 280px; height: 2px;
+      background: rgba(0,212,255,0.15);
+      border-radius: 99px; margin-top: 20px; overflow: hidden;
+    }
+    .boot-progress {
+      height: 100%; width: 0%;
+      background: linear-gradient(90deg, var(--z8), var(--z6));
+      border-radius: 99px;
+      transition: width 1.8s ease;
+    }
 
-    /* ── Nav ── */
+    /* ── Layout ────────────────────────────────────────────── */
+    .container { max-width: 960px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
+
+    /* ── HUD bracket helper ────────────────────────────────── */
+    .hud {
+      position: relative;
+    }
+    .hud::before, .hud::after {
+      content: '';
+      position: absolute;
+      width: 14px; height: 14px;
+      border-color: var(--z8);
+      border-style: solid;
+      opacity: 0.5;
+      transition: opacity 0.3s, width 0.3s, height 0.3s;
+    }
+    .hud::before { top: -4px; left: -4px; border-width: 2px 0 0 2px; }
+    .hud::after  { bottom: -4px; right: -4px; border-width: 0 2px 2px 0; }
+    .hud:hover::before, .hud:hover::after { opacity: 1; width: 20px; height: 20px; }
+
+    /* ── Nav ───────────────────────────────────────────────── */
     nav {
-      padding: 28px 0 0;
+      padding: 28px 0;
       display: flex; align-items: center; justify-content: space-between;
     }
     .logo {
-      font-size: 1rem; font-weight: 900; letter-spacing: 2px; text-transform: uppercase;
-      background: linear-gradient(135deg, var(--amber), var(--red), var(--violet2));
+      font-family: 'Space Mono', monospace;
+      font-size: 0.85rem; font-weight: 700; letter-spacing: 3px;
+      background: linear-gradient(90deg, var(--z8), var(--z6));
       -webkit-background-clip: text; -webkit-text-fill-color: transparent;
     }
-    .nav-badge {
-      display: flex; align-items: center; gap: 7px;
-      background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.25);
-      border-radius: 99px; padding: 5px 14px;
-      font-size: 0.75rem; font-weight: 600; color: var(--red);
+    .sys-status {
+      display: flex; align-items: center; gap: 8px;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.68rem; color: var(--z4);
+      border: 1px solid rgba(34,197,94,0.25);
+      background: rgba(34,197,94,0.06);
+      border-radius: 4px; padding: 5px 12px;
+      letter-spacing: 1px;
     }
-    .blink { width: 7px; height: 7px; border-radius: 50%; background: var(--red); animation: blink 1.2s infinite; }
+    .status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--z4); animation: blink 1.5s infinite; }
     @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
 
-    /* ── Hero ── */
-    .hero { text-align: center; padding: 80px 0 56px; }
+    /* ── Hero ──────────────────────────────────────────────── */
+    .hero { text-align: center; padding: 72px 0 56px; position: relative; }
 
-    .hero-eyebrow {
-      font-size: 0.78rem; font-weight: 700; letter-spacing: 3px;
-      text-transform: uppercase; color: var(--amber); margin-bottom: 24px;
+    .hero-scan {
+      position: absolute; left: 0; right: 0; top: 0; height: 2px;
+      background: linear-gradient(90deg, transparent, var(--z8), transparent);
+      animation: scan 4s ease-in-out infinite;
+      opacity: 0.4;
     }
+    @keyframes scan {
+      0%   { top: 0%;   opacity: 0; }
+      10%  { opacity: 0.4; }
+      90%  { opacity: 0.4; }
+      100% { top: 100%; opacity: 0; }
+    }
+
+    .hero-tag {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.7rem; letter-spacing: 3px; text-transform: uppercase;
+      color: var(--z8); margin-bottom: 24px;
+      display: inline-flex; align-items: center; gap: 8px;
+    }
+    .hero-tag::before, .hero-tag::after { content: '//'; opacity: 0.4; }
 
     h1 {
-      font-size: clamp(2.6rem, 7vw, 5rem);
-      font-weight: 900; letter-spacing: -3px; line-height: 1.05;
+      font-size: clamp(2.8rem, 7vw, 5.2rem);
+      font-weight: 900; letter-spacing: -3px; line-height: 1.0;
       margin-bottom: 28px;
     }
-    h1 .linha1 { display: block; color: var(--text); }
-    h1 .linha2 {
+    h1 .l1 { display: block; color: var(--text); }
+    h1 .l2 {
       display: block;
-      background: linear-gradient(135deg, var(--amber) 0%, var(--red) 50%, var(--violet2) 100%);
+      background: linear-gradient(135deg, var(--z8) 0%, var(--z6) 50%, var(--z7) 100%);
       -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 0 30px rgba(168,85,247,0.4));
     }
 
     .hero-sub {
-      font-size: 1.15rem; color: var(--muted);
-      max-width: 620px; margin: 0 auto 44px;
+      font-size: 1.1rem; color: var(--muted);
+      max-width: 600px; margin: 0 auto 44px; line-height: 1.8;
     }
     .hero-sub strong { color: var(--text); font-weight: 600; }
 
     .hero-cta {
       display: inline-flex; align-items: center; gap: 10px;
-      background: linear-gradient(135deg, var(--amber), var(--red));
-      color: #fff; font-weight: 800; font-size: 1rem;
-      padding: 18px 40px; border-radius: 99px; text-decoration: none;
-      transition: transform 0.2s, box-shadow 0.2s;
-      box-shadow: 0 0 50px rgba(239,68,68,0.4);
-      letter-spacing: -0.3px;
+      background: transparent;
+      border: 1px solid var(--z8);
+      color: var(--z8); font-weight: 700; font-size: 0.95rem;
+      padding: 16px 40px; border-radius: 4px; text-decoration: none;
+      font-family: 'Space Mono', monospace; letter-spacing: 1px;
+      position: relative; overflow: hidden;
+      transition: color 0.3s, box-shadow 0.3s;
+      box-shadow: 0 0 20px rgba(6,182,212,0.2), inset 0 0 20px rgba(6,182,212,0.05);
     }
-    .hero-cta:hover { transform: translateY(-3px); box-shadow: 0 0 70px rgba(239,68,68,0.6); }
+    .hero-cta::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, var(--z8), var(--z6));
+      opacity: 0; transition: opacity 0.3s;
+    }
+    .hero-cta:hover { color: #fff; box-shadow: 0 0 40px rgba(6,182,212,0.5); }
+    .hero-cta:hover::before { opacity: 1; }
+    .hero-cta span { position: relative; z-index: 1; }
 
-    /* ── Contador ── */
-    .counter-wrap { text-align: center; padding: 16px 0 64px; }
+    /* ── Counter ───────────────────────────────────────────── */
+    .counter-wrap { text-align: center; padding: 8px 0 72px; }
     .counter {
-      display: inline-flex; align-items: center; gap: 12px;
-      background: var(--card); border: 1px solid var(--border);
-      border-radius: 99px; padding: 12px 28px; font-size: 0.95rem; font-weight: 500;
+      display: inline-flex; align-items: center; gap: 16px;
+      border: 1px solid var(--border);
+      background: rgba(0,212,255,0.03);
+      border-radius: 4px; padding: 14px 32px;
     }
+    .counter-label { font-family: 'Space Mono', monospace; font-size: 0.65rem; color: var(--muted); letter-spacing: 2px; }
     .counter-num {
-      font-size: 1.7rem; font-weight: 900;
-      background: linear-gradient(135deg, var(--amber), var(--red));
+      font-family: 'Space Mono', monospace;
+      font-size: 2.2rem; font-weight: 700;
+      background: linear-gradient(135deg, var(--z8), var(--z6));
       -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 0 12px rgba(6,182,212,0.6));
     }
 
-    /* ── Seções ── */
-    .section-eyebrow {
-      text-align: center; font-size: 0.75rem; font-weight: 700;
-      letter-spacing: 3px; text-transform: uppercase; color: var(--amber); margin-bottom: 14px;
-    }
-    .section-title {
-      text-align: center; font-size: clamp(1.7rem, 4vw, 2.6rem);
-      font-weight: 900; letter-spacing: -1.5px; margin-bottom: 16px;
-    }
-    .section-sub {
-      text-align: center; color: var(--muted); font-size: 1rem;
-      max-width: 560px; margin: 0 auto 52px;
+    /* ── Divider ───────────────────────────────────────────── */
+    .divider {
+      height: 1px; margin-bottom: 80px;
+      background: linear-gradient(90deg, transparent, var(--border), transparent);
     }
 
-    /* ── Cards ── */
+    /* ── Section header ────────────────────────────────────── */
+    .sec-tag {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.65rem; letter-spacing: 3px; text-transform: uppercase;
+      color: var(--muted); text-align: center; margin-bottom: 12px;
+    }
+    .sec-title {
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      font-weight: 900; letter-spacing: -1.5px;
+      text-align: center; margin-bottom: 14px;
+    }
+    .sec-sub {
+      text-align: center; color: var(--muted); font-size: 0.97rem;
+      max-width: 540px; margin: 0 auto 56px; line-height: 1.8;
+    }
+
+    /* ── Zones legend ──────────────────────────────────────── */
+    .zones-legend {
+      display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;
+      margin-bottom: 80px;
+    }
+    .zone-pill {
+      display: flex; align-items: center; gap: 8px;
+      border-radius: 4px; padding: 8px 16px;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.7rem; letter-spacing: 1px;
+      border: 1px solid;
+      transition: transform 0.2s;
+    }
+    .zone-pill:hover { transform: translateY(-2px); }
+    .zone-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+    /* ── Cards ─────────────────────────────────────────────── */
     .cards {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 18px; margin-bottom: 90px;
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 20px; margin-bottom: 90px;
     }
     .card {
-      background: var(--card); border: 1px solid var(--border);
-      border-radius: 20px; padding: 30px 26px;
-      transition: transform 0.2s, border-color 0.2s;
+      background: rgba(255,255,255,0.02);
+      border-radius: 6px; padding: 32px 28px;
+      position: relative; overflow: hidden;
+      transition: transform 0.25s;
     }
-    .card:hover { transform: translateY(-4px); border-color: rgba(245,158,11,0.35); }
-    .card-icon { font-size: 2rem; margin-bottom: 14px; display: block; }
-    .card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 8px; }
-    .card p { font-size: 0.88rem; color: var(--muted); line-height: 1.65; }
+    .card:hover { transform: translateY(-4px); }
+    .card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    }
+    /* Corner brackets */
+    .card::after {
+      content: '';
+      position: absolute;
+      bottom: 10px; right: 10px;
+      width: 10px; height: 10px;
+      border-right: 1px solid; border-bottom: 1px solid;
+      opacity: 0.4;
+    }
+    .card-top-left {
+      position: absolute; top: 10px; left: 10px;
+      width: 10px; height: 10px;
+      border-left: 1px solid; border-top: 1px solid; opacity: 0.4;
+    }
+    .card-icon { font-size: 1.8rem; margin-bottom: 16px; display: block; }
+    .card-zone {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.6rem; letter-spacing: 2px; text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+    .card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 10px; }
+    .card p  { font-size: 0.87rem; color: var(--muted); line-height: 1.7; }
 
-    /* ── Nomes real-time ── */
+    /* Card zone colors */
+    .c1 { border:1px solid rgba(239,68,68,0.2);  } .c1::before{background:var(--z1);} .c1::after{border-color:var(--z1);} .c1 .card-top-left{border-color:var(--z1);}
+    .c2 { border:1px solid rgba(249,115,22,0.2); } .c2::before{background:var(--z2);} .c2::after{border-color:var(--z2);} .c2 .card-top-left{border-color:var(--z2);}
+    .c3 { border:1px solid rgba(234,179,8,0.2);  } .c3::before{background:var(--z3);} .c3::after{border-color:var(--z3);} .c3 .card-top-left{border-color:var(--z3);}
+    .c4 { border:1px solid rgba(34,197,94,0.2);  } .c4::before{background:var(--z4);} .c4::after{border-color:var(--z4);} .c4 .card-top-left{border-color:var(--z4);}
+    .c5 { border:1px solid rgba(59,130,246,0.2); } .c5::before{background:var(--z5);} .c5::after{border-color:var(--z5);} .c5 .card-top-left{border-color:var(--z5);}
+    .c6 { border:1px solid rgba(168,85,247,0.2); } .c6::before{background:var(--z6);} .c6::after{border-color:var(--z6);} .c6 .card-top-left{border-color:var(--z6);}
+
+    /* ── Names wall ────────────────────────────────────────── */
     .names-section { padding: 0 0 90px; }
     .names-grid {
-      display: flex; flex-wrap: wrap; gap: 12px;
-      justify-content: center; min-height: 60px;
+      display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;
+      min-height: 60px;
     }
     .name-chip {
       display: flex; align-items: center; gap: 9px;
-      background: var(--card); border: 1px solid var(--border);
-      border-radius: 99px; padding: 8px 18px;
-      font-size: 0.87rem; font-weight: 500;
-      animation: popIn 0.4s cubic-bezier(0.34,1.56,0.64,1);
+      border-radius: 4px; padding: 8px 16px;
+      font-family: 'Space Mono', monospace; font-size: 0.78rem; letter-spacing: 1px;
+      border: 1px solid; animation: chipIn 0.5s cubic-bezier(0.34,1.56,0.64,1);
     }
-    .name-chip .av {
-      width: 27px; height: 27px; border-radius: 50%;
+    @keyframes chipIn {
+      from { transform: scale(0.6) translateY(10px); opacity: 0; }
+      to   { transform: scale(1)   translateY(0);    opacity: 1; }
+    }
+    .chip-av {
+      width: 24px; height: 24px; border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
-      font-size: 0.68rem; font-weight: 800; color: #fff; flex-shrink: 0;
+      font-size: 0.6rem; font-weight: 700; color: #fff; flex-shrink: 0;
     }
-    @keyframes popIn { from{transform:scale(0.5);opacity:0} to{transform:scale(1);opacity:1} }
-    .empty-state { text-align: center; color: var(--muted); font-size: 0.9rem; padding: 24px; width: 100%; }
+    .empty-state {
+      text-align: center; color: var(--muted);
+      font-family: 'Space Mono', monospace; font-size: 0.78rem;
+      letter-spacing: 1px; padding: 28px; width: 100%;
+    }
 
-    /* ── Formulário ── */
+    /* ── Form ──────────────────────────────────────────────── */
     .form-section { padding: 0 0 100px; }
     .form-box {
-      background: var(--card); border: 1px solid var(--border);
-      border-radius: 28px; padding: 52px 48px;
-      backdrop-filter: blur(24px);
+      background: rgba(0,212,255,0.02);
+      border: 1px solid var(--border);
+      border-radius: 6px; padding: 52px 48px;
+      position: relative;
     }
-    @media(max-width:600px){ .form-box{ padding:32px 22px; } }
+    .form-box::before {
+      content: 'IDENTITY_VERIFICATION.exe';
+      position: absolute; top: -10px; left: 24px;
+      font-family: 'Space Mono', monospace; font-size: 0.65rem;
+      color: var(--z8); background: var(--bg);
+      padding: 0 10px; letter-spacing: 1px;
+    }
+    .form-box::after {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--z8), var(--z6), transparent);
+    }
+    @media(max-width:600px){ .form-box{ padding:40px 20px; } }
 
-    .form-sub { color: var(--muted); font-size: 0.95rem; margin-bottom: 38px; line-height: 1.7; }
+    .form-sub { color: var(--muted); font-size: 0.9rem; margin-bottom: 40px; line-height: 1.8; }
 
-    .field { margin-bottom: 24px; }
-    label { display: block; font-size: 0.84rem; font-weight: 600; margin-bottom: 8px; }
-    label .req { color: var(--amber); }
-    label .hint { color: var(--muted); font-weight: 400; }
+    .field { margin-bottom: 26px; }
+    label {
+      display: block; font-family: 'Space Mono', monospace;
+      font-size: 0.68rem; letter-spacing: 2px; text-transform: uppercase;
+      color: var(--z8); margin-bottom: 10px;
+    }
+    label .hint { color: var(--muted); text-transform: none; letter-spacing: 0; font-family: 'Inter', sans-serif; font-size: 0.82rem; }
 
     input[type="text"],
     input[type="email"],
     textarea {
-      width: 100%; background: rgba(255,255,255,0.05);
-      border: 1px solid var(--border); border-radius: 12px;
-      padding: 14px 18px; color: var(--text);
-      font-family: 'Inter', sans-serif; font-size: 0.95rem;
+      width: 100%;
+      background: rgba(0,212,255,0.03);
+      border: 1px solid rgba(0,212,255,0.15);
+      border-radius: 4px; padding: 14px 18px;
+      color: var(--text);
+      font-family: 'Space Mono', monospace; font-size: 0.85rem;
       transition: border-color 0.2s, box-shadow 0.2s; outline: none;
     }
     input:focus, textarea:focus {
-      border-color: var(--amber);
-      box-shadow: 0 0 0 3px rgba(245,158,11,0.15);
+      border-color: var(--z8);
+      box-shadow: 0 0 0 3px rgba(6,182,212,0.1), 0 0 20px rgba(6,182,212,0.1);
     }
     textarea { resize: vertical; min-height: 100px; }
 
     .radio-group { display: flex; flex-direction: column; gap: 10px; }
     .radio-opt {
       display: flex; align-items: center; gap: 12px;
-      background: rgba(255,255,255,0.03); border: 1px solid var(--border);
-      border-radius: 12px; padding: 13px 16px; cursor: pointer;
-      transition: border-color 0.2s, background 0.2s; font-size: 0.92rem;
-    }
-    .radio-opt:hover { border-color: var(--amber); background: rgba(245,158,11,0.07); }
-    .radio-opt input[type="radio"] { accent-color: var(--amber); width: 16px; height: 16px; flex-shrink:0; }
-
-    .check-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .check-opt {
-      display: flex; align-items: center; gap: 10px;
-      background: rgba(255,255,255,0.03); border: 1px solid var(--border);
-      border-radius: 12px; padding: 13px 14px; cursor: pointer;
+      background: rgba(0,212,255,0.02);
+      border: 1px solid rgba(0,212,255,0.1);
+      border-radius: 4px; padding: 13px 16px; cursor: pointer;
+      font-size: 0.9rem;
       transition: border-color 0.2s, background 0.2s;
     }
-    .check-opt:hover { border-color: var(--amber); background: rgba(245,158,11,0.07); }
-    .check-opt input[type="checkbox"] { accent-color: var(--amber); width: 16px; height: 16px; flex-shrink:0; }
+    .radio-opt:hover { border-color: rgba(0,212,255,0.35); background: rgba(0,212,255,0.05); }
+    .radio-opt input[type="radio"] { accent-color: var(--z8); width: 15px; height: 15px; flex-shrink:0; }
+
+    .check-group { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+    .check-group-7 { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
+    @media(max-width:600px) { .check-group-7 { grid-template-columns: repeat(4, 1fr); } }
+    .check-opt {
+      display: flex; align-items: center; gap: 10px;
+      background: rgba(0,212,255,0.02);
+      border: 1px solid rgba(0,212,255,0.1);
+      border-radius: 4px; padding: 12px 14px; cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .check-opt:hover { border-color: rgba(0,212,255,0.35); background: rgba(0,212,255,0.05); }
+    .check-opt input[type="checkbox"] { accent-color: var(--z8); width: 15px; height: 15px; flex-shrink:0; }
     .check-opt span { font-size: 0.87rem; }
+    .check-group-7 .check-opt { flex-direction: column; gap: 6px; padding: 10px 6px; justify-content: center; text-align: center; }
+    .check-group-7 .check-opt span { font-size: 0.75rem; }
+
+    /* Color picker */
+    .color-picker { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 4px; }
+    .color-swatch {
+      width: 38px; height: 38px; border-radius: 50%; cursor: pointer;
+      border: 2px solid transparent;
+      transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+    }
+    .color-swatch:hover { transform: scale(1.15); }
+    .color-swatch.selected {
+      border-color: #fff;
+      transform: scale(1.2);
+      box-shadow: 0 0 16px var(--swatch-glow, rgba(255,255,255,0.5));
+    }
+    .cor-preview {
+      display: none; align-items: center; gap: 10px;
+      margin-top: 12px; font-family: 'Space Mono', monospace;
+      font-size: 0.7rem; letter-spacing: 1px;
+    }
+    .cor-preview.on { display: flex; }
+    .cor-preview-dot { width: 20px; height: 20px; border-radius: 50%; flex-shrink:0; }
 
     .zona-campo { display: none; }
     .zona-campo.visible { display: block; }
 
     .btn-submit {
-      width: 100%; padding: 20px;
-      background: linear-gradient(135deg, var(--amber), var(--red));
-      border: none; border-radius: 14px; color: #fff;
-      font-family: 'Inter', sans-serif; font-size: 1.05rem; font-weight: 800;
-      cursor: pointer; margin-top: 10px;
-      transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s;
-      box-shadow: 0 0 40px rgba(239,68,68,0.35);
-      letter-spacing: -0.3px;
+      width: 100%; padding: 18px;
+      background: transparent;
+      border: 1px solid var(--z8);
+      border-radius: 4px; color: var(--z8);
+      font-family: 'Space Mono', monospace;
+      font-size: 0.9rem; font-weight: 700; letter-spacing: 2px;
+      cursor: pointer; margin-top: 12px;
+      position: relative; overflow: hidden;
+      transition: color 0.3s, box-shadow 0.3s;
+      box-shadow: 0 0 20px rgba(6,182,212,0.15), inset 0 0 20px rgba(6,182,212,0.05);
     }
-    .btn-submit:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 0 60px rgba(239,68,68,0.55); }
-    .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; }
+    .btn-submit::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, var(--z8), var(--z6));
+      opacity: 0; transition: opacity 0.3s;
+    }
+    .btn-submit:hover:not(:disabled) { color: #fff; box-shadow: 0 0 40px rgba(6,182,212,0.4); }
+    .btn-submit:hover:not(:disabled)::before { opacity: 1; }
+    .btn-submit span { position: relative; z-index: 1; }
+    .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
 
-    .success-box { display: none; text-align: center; padding: 52px 24px; }
-    .success-box.visible { display: block; }
-    .success-icon { font-size: 4rem; margin-bottom: 18px; animation: bounceIn 0.6s; }
-    @keyframes bounceIn { 0%{transform:scale(0)} 60%{transform:scale(1.2)} 100%{transform:scale(1)} }
-    .success-box h3 { font-size: 1.8rem; font-weight: 900; margin-bottom: 12px; letter-spacing: -1px; }
-    .success-box p { color: var(--muted); line-height: 1.7; }
+    /* ── Success ───────────────────────────────────────────── */
+    .success-box { display: none; text-align: center; padding: 60px 24px; }
+    .success-box.on { display: block; }
+    .success-icon { font-size: 3.5rem; margin-bottom: 20px; animation: zoomIn 0.5s; }
+    @keyframes zoomIn { from{transform:scale(0)} to{transform:scale(1)} }
+    .success-box h3 {
+      font-family: 'Space Mono', monospace;
+      font-size: 1.4rem; letter-spacing: 2px;
+      background: linear-gradient(135deg, var(--z8), var(--z6));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      margin-bottom: 14px;
+    }
+    .success-box p { color: var(--muted); line-height: 1.8; }
 
-    .err { color: #f87171; font-size: 0.8rem; margin-top: 6px; display: none; }
+    .err { color: #ef4444; font-family: 'Space Mono', monospace; font-size: 0.7rem; margin-top: 6px; letter-spacing: 1px; display: none; }
     .err.on { display: block; }
 
-    .divider { height: 1px; background: var(--border); margin-bottom: 90px; }
-
+    /* ── Footer ────────────────────────────────────────────── */
     footer {
       text-align: center; padding: 40px 0;
-      color: var(--muted); font-size: 0.8rem;
       border-top: 1px solid var(--border);
       position: relative; z-index: 1;
     }
-    footer strong { color: var(--amber); }
+    footer p {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.68rem; color: var(--muted); letter-spacing: 1px;
+    }
+    footer strong {
+      background: linear-gradient(90deg, var(--z8), var(--z6));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
   </style>
 </head>
 <body>
 
-<div class="bg-orbs">
+<!-- Boot screen -->
+<div id="boot">
+  <div class="boot-logo">AIOSTOMATIZADOR</div>
+  <div class="boot-line" id="b1">// SYSTEM INITIALIZING...</div>
+  <div class="boot-line" id="b2">// LOADING GENIUS ZONES... OK</div>
+  <div class="boot-line" id="b3">// CONNECTING JARVIS CORE... OK</div>
+  <div class="boot-line" id="b4">// FACTORY STATUS: ONLINE ✓</div>
+  <div class="boot-bar"><div class="boot-progress" id="boot-bar"></div></div>
+</div>
+
+<!-- Prismatic orbs -->
+<div class="orbs">
   <div class="orb orb-1"></div>
   <div class="orb orb-2"></div>
   <div class="orb orb-3"></div>
+  <div class="orb orb-4"></div>
 </div>
 
 <div class="container">
@@ -272,171 +516,245 @@
   <!-- Nav -->
   <nav>
     <div class="logo">AIOSTOMATIZADOR</div>
-    <div class="nav-badge"><span class="blink"></span> Vagas abertas</div>
+    <div class="sys-status">
+      <span class="status-dot"></span>
+      SISTEMA ONLINE
+    </div>
   </nav>
 
   <!-- Hero -->
   <section class="hero">
-    <p class="hero-eyebrow">⚡ A fábrica de execução chegou</p>
+    <div class="hero-scan"></div>
+    <p class="hero-tag">fábrica de execução</p>
     <h1>
-      <span class="linha1">Você não precisa de mais</span>
-      <span class="linha2">uma ideia. Precisa de Jarvis.</span>
+      <span class="l1">Você não precisa de mais</span>
+      <span class="l2">uma ideia. Precisa de Jarvis.</span>
     </h1>
     <p class="hero-sub">
-      200 pessoas. Uma IA que organiza tudo. Projetos saindo do papel
-      toda semana. O <strong>AIOSTOMATIZADOR</strong> é a fábrica onde
-      você entra com seu talento e sai com resultados reais —
-      no seu tempo, no seu ritmo, no seu superpoder.
+      Uma legião em execução. Uma IA que organiza tudo. Projetos saindo do papel em alguns dias. Às vezes, em horas.
+      O <strong>AIOSTOMATIZADOR</strong> é a fábrica onde você entra com
+      seu talento e sai com resultados reais — no seu tempo, no seu superpoder.
     </p>
-    <a href="#formulario" class="hero-cta">⚡ Entrar na fábrica agora</a>
+    <a href="#formulario" class="hero-cta">
+      <span>⚡ ENTRAR NA FÁBRICA</span>
+    </a>
   </section>
 
-  <!-- Contador -->
+  <!-- Counter -->
   <div class="counter-wrap">
-    <div class="counter">
-      🏭
-      <span class="counter-num" id="contador">0</span>
-      <span>pessoas já na fábrica</span>
+    <div class="counter hud">
+      <div>
+        <div class="counter-label">AGENTES ONLINE</div>
+        <div class="counter-num" id="contador">000</div>
+      </div>
     </div>
   </div>
 
   <div class="divider"></div>
 
-  <!-- Como funciona -->
-  <p class="section-eyebrow">como funciona</p>
-  <h2 class="section-title">Não é uma comunidade.<br/>É uma máquina de execução.</h2>
-  <p class="section-sub">
-    Cada pessoa entra com o que faz de melhor. O AIOS — seu Jarvis — organiza os times,
-    delega as tarefas e garante que o projeto anda, mesmo quando você não está online.
-  </p>
+  <!-- Zones legend -->
+  <p class="sec-tag">// genius_zones.map</p>
+  <h2 class="sec-title">Cada talento tem sua cor.</h2>
+  <p class="sec-sub">A fábrica organiza os times pelo que cada pessoa realmente é — não pelo cargo que tem.</p>
+
+  <div class="zones-legend">
+    <div class="zone-pill" style="border-color:rgba(239,68,68,0.35);color:var(--z1);background:rgba(239,68,68,0.06)">
+      <span class="zone-dot" style="background:var(--z1)"></span>ESTRATEGISTA
+    </div>
+    <div class="zone-pill" style="border-color:rgba(249,115,22,0.35);color:var(--z2);background:rgba(249,115,22,0.06)">
+      <span class="zone-dot" style="background:var(--z2)"></span>CRIATIVO
+    </div>
+    <div class="zone-pill" style="border-color:rgba(234,179,8,0.35);color:var(--z3);background:rgba(234,179,8,0.06)">
+      <span class="zone-dot" style="background:var(--z3)"></span>COMUNICADOR
+    </div>
+    <div class="zone-pill" style="border-color:rgba(34,197,94,0.35);color:var(--z4);background:rgba(34,197,94,0.06)">
+      <span class="zone-dot" style="background:var(--z4)"></span>CONSTRUTOR
+    </div>
+    <div class="zone-pill" style="border-color:rgba(59,130,246,0.35);color:var(--z5);background:rgba(59,130,246,0.06)">
+      <span class="zone-dot" style="background:var(--z5)"></span>ANALISTA
+    </div>
+    <div class="zone-pill" style="border-color:rgba(168,85,247,0.35);color:var(--z6);background:rgba(168,85,247,0.06)">
+      <span class="zone-dot" style="background:var(--z6)"></span>VISIONÁRIO
+    </div>
+    <div class="zone-pill" style="border-color:rgba(236,72,153,0.35);color:var(--z7);background:rgba(236,72,153,0.06)">
+      <span class="zone-dot" style="background:var(--z7)"></span>CONECTOR
+    </div>
+    <div class="zone-pill" style="border-color:rgba(6,182,212,0.35);color:var(--z8);background:rgba(6,182,212,0.06)">
+      <span class="zone-dot" style="background:var(--z8)"></span>EXECUTOR
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Cards -->
+  <p class="sec-tag">// factory.modules</p>
+  <h2 class="sec-title">Não é uma comunidade.<br/>É uma máquina de execução.</h2>
+  <p class="sec-sub">Cada módulo da fábrica opera com sua zona de cor. Juntos formam o espectro completo.</p>
 
   <div class="cards">
-    <div class="card">
+    <div class="card c1 hud">
+      <div class="card-top-left"></div>
       <span class="card-icon">🤖</span>
+      <div class="card-zone" style="color:var(--z1)">// módulo 01</div>
       <h3>Seu Jarvis particular</h3>
-      <p>A IA conhece sua Zona de Genialidade — o que você faz bem e ama fazer — e te coloca no projeto certo, na hora certa. Sem achismo. Sem politicagem.</p>
+      <p>A IA conhece sua Zona de Genialidade e te coloca no projeto certo, na hora certa. Sem achismo. Sem politicagem.</p>
     </div>
-    <div class="card">
+    <div class="card c2 hud">
+      <div class="card-top-left"></div>
       <span class="card-icon">🏭</span>
+      <div class="card-zone" style="color:var(--z2)">// módulo 02</div>
       <h3>A fábrica não para</h3>
-      <p>Alguém sempre está construindo algo. Você entra quando quiser e a máquina já sabe exatamente onde você encaixa. Sem precisar de reunião de onboarding.</p>
+      <p>Alguém sempre está construindo algo. Você entra quando quiser e a máquina já sabe exatamente onde você encaixa.</p>
     </div>
-    <div class="card">
+    <div class="card c3 hud">
+      <div class="card-top-left"></div>
       <span class="card-icon">⚡</span>
+      <div class="card-zone" style="color:var(--z3)">// módulo 03</div>
       <h3>Execução, não papo</h3>
-      <p>Chega de grupo no WhatsApp cheio de ideia e zero entrega. Aqui o AIOS delega, organiza e executa. Você aparece, entrega e cresce.</p>
+      <p>Chega de grupo no WhatsApp cheio de ideia e zero entrega. O AIOS delega, organiza e executa. Você aparece e cresce.</p>
     </div>
-    <div class="card">
+    <div class="card c4 hud">
+      <div class="card-top-left"></div>
       <span class="card-icon">🧬</span>
+      <div class="card-zone" style="color:var(--z4)">// módulo 04</div>
       <h3>No seu superpoder</h3>
-      <p>Times montados por habilidade real — não por quem gritou mais alto. Cada pessoa brilha onde é boa e, com o tempo, vira coringa em tudo.</p>
+      <p>Times montados por habilidade real — não por quem gritou mais alto. Cada pessoa brilha onde é boa.</p>
     </div>
-    <div class="card">
+    <div class="card c5 hud">
+      <div class="card-top-left"></div>
       <span class="card-icon">🎴</span>
+      <div class="card-zone" style="color:var(--z5)">// módulo 05</div>
       <h3>Reconhecimento real</h3>
-      <p>Figurinhas únicas, currículo automático do que você construiu de verdade e contribuições visíveis para todo o time. Seu esforço não passa em branco.</p>
+      <p>Figurinhas únicas, currículo automático e contribuições visíveis. Seu esforço não passa em branco nunca mais.</p>
     </div>
-    <div class="card">
+    <div class="card c6 hud">
+      <div class="card-top-left"></div>
       <span class="card-icon">🚀</span>
+      <div class="card-zone" style="color:var(--z6)">// módulo 06</div>
       <h3>Hack Weekend</h3>
-      <p>Desafios intensivos com contagem progressiva. Termine antes do prazo e ganhe selos de lenda: ⚡ Relâmpago, 🚀 Foguete, 🏆 Lendário.</p>
+      <p>Desafios intensivos com contagem progressiva. Termine antes do prazo: ⚡ Relâmpago, 🚀 Foguete, 🏆 Lendário.</p>
     </div>
   </div>
 
   <div class="divider"></div>
 
-  <!-- Nomes em tempo real -->
+  <!-- Names wall -->
   <section class="names-section">
-    <p class="section-eyebrow">quem já está na fábrica</p>
-    <h2 class="section-title">Cada nome aqui é alguém<br/>que escolheu executar. 🏭</h2>
+    <p class="sec-tag">// agents.online</p>
+    <h2 class="sec-title">Agentes conectados.</h2>
+    <p class="sec-sub">Cada cor é uma zona de genialidade. A fábrica cresce em tempo real.</p>
     <div class="names-grid" id="nomes-grid">
-      <p class="empty-state">Seja a primeira pessoa a entrar na fábrica 👇</p>
+      <p class="empty-state">[ AGUARDANDO PRIMEIRO AGENTE... ]</p>
     </div>
   </section>
 
   <div class="divider"></div>
 
-  <!-- Formulário -->
+  <!-- Form -->
   <section class="form-section" id="formulario">
-    <p class="section-eyebrow">garanta sua vaga</p>
-    <h2 class="section-title">A fábrica está selecionando<br/>os primeiros membros.</h2>
+    <p class="sec-tag">// access_request.init</p>
+    <h2 class="sec-title">Solicite acesso à fábrica.</h2>
+    <p class="sec-sub">Apenas agentes selecionados são admitidos. Seus dados pré-carregam seu perfil quando a plataforma abrir.</p>
     <br/>
     <div class="form-box">
 
       <div class="success-box" id="sucesso">
         <div class="success-icon">⚡</div>
-        <h3>Bem-vindo à fábrica!</h3>
-        <p>Seu nome já apareceu na lista acima.<br/>
+        <h3>// ACESSO CONCEDIDO</h3>
+        <p>Seu nome já apareceu na lista de agentes.<br/>
         Em breve você receberá o link de acesso.<br/>
-        O Jarvis já está preparando o seu lugar.</p>
+        O Jarvis já está preparando seu lugar na fábrica.</p>
       </div>
 
       <form id="form-inscricao">
         <p class="form-sub">
-          Apenas pessoas selecionadas entram. Preencha abaixo —
-          seus dados já vão pré-carregar seu perfil quando a plataforma abrir.
-          Você não vai precisar preencher nada de novo.
+          Apenas pessoas selecionadas entram. Preencha abaixo — seus dados já vão
+          pré-carregar seu perfil quando a plataforma abrir. Você não vai precisar preencher nada de novo.
         </p>
 
         <div class="field">
-          <label>Nome completo <span class="req">*</span></label>
+          <label>NOME_COMPLETO <span style="color:var(--z2)">*</span></label>
           <input type="text" id="nome" placeholder="Seu nome completo" required />
-          <div class="err" id="err-nome">Por favor, insira seu nome.</div>
+          <div class="err" id="err-nome">// ERRO: campo obrigatório</div>
         </div>
 
         <div class="field">
-          <label>Email <span class="req">*</span></label>
+          <label>EMAIL_ID <span style="color:var(--z2)">*</span></label>
           <input type="email" id="email" placeholder="seu@email.com" required />
-          <div class="err" id="err-email">Por favor, insira um email válido.</div>
+          <div class="err" id="err-email">// ERRO: email inválido</div>
         </div>
 
         <div class="field">
-          <label>Você já tem sua Zona de Genialidade documentada? <span class="req">*</span></label>
+          <label>GENIUS_ZONE_STATUS <span style="color:var(--z2)">*</span></label>
           <div class="radio-group" id="zona-radio">
             <label class="radio-opt">
               <input type="radio" name="tem_zona" value="sim" required />
-              ✅ &nbsp;Sim, já tenho!
+              ✅ &nbsp;Sim — já tenho minha Zona de Genialidade
             </label>
             <label class="radio-opt">
               <input type="radio" name="tem_zona" value="nao" required />
-              ⏳ &nbsp;Ainda não, mas quero descobrir
+              ⏳ &nbsp;Ainda não — quero descobrir na plataforma
             </label>
           </div>
         </div>
 
         <div class="field zona-campo" id="zona-campo">
-          <label>Cole aqui o texto da sua Zona de Genialidade
-            <span class="hint"> — vai pré-carregar seu perfil automaticamente</span>
-          </label>
+          <label>GENIUS_ZONE_DATA <span class="hint"> — vai pré-carregar seu perfil</span></label>
           <textarea id="zona_texto" placeholder="Cole ou escreva sua zona de genialidade aqui..."></textarea>
         </div>
 
         <div class="field">
-          <label>Quando você prefere trabalhar?
-            <span class="hint"> &nbsp;(preferência pessoal — sem compromisso nenhum)</span>
-          </label>
+          <label>SUA_COR <span class="hint"> &nbsp;— escolha a cor que vai te representar na fábrica</span></label>
+          <div class="color-picker" id="color-picker">
+            <div class="color-swatch" data-cor="#ef4444" style="background:#ef4444" title="Vermelho"></div>
+            <div class="color-swatch" data-cor="#f97316" style="background:#f97316" title="Laranja"></div>
+            <div class="color-swatch" data-cor="#eab308" style="background:#eab308" title="Dourado"></div>
+            <div class="color-swatch" data-cor="#22c55e" style="background:#22c55e" title="Verde"></div>
+            <div class="color-swatch" data-cor="#3b82f6" style="background:#3b82f6" title="Azul"></div>
+            <div class="color-swatch" data-cor="#a855f7" style="background:#a855f7" title="Roxo"></div>
+            <div class="color-swatch" data-cor="#ec4899" style="background:#ec4899" title="Rosa"></div>
+            <div class="color-swatch" data-cor="#06b6d4" style="background:#06b6d4" title="Ciano"></div>
+          </div>
+          <input type="hidden" id="cor_escolhida" value="" />
+          <div class="cor-preview" id="cor-preview">
+            <div class="cor-preview-dot" id="cor-preview-dot"></div>
+            <span id="cor-preview-txt"></span>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>PERÍODO_DO_DIA <span class="hint"> &nbsp;— preferência pessoal, sem compromisso</span></label>
           <div class="check-group">
             <label class="check-opt">
-              <input type="checkbox" value="manha" />
+              <input type="checkbox" class="periodo" value="manha" />
               <span>🌅 Manhã</span>
             </label>
             <label class="check-opt">
-              <input type="checkbox" value="tarde" />
+              <input type="checkbox" class="periodo" value="tarde" />
               <span>☀️ Tarde</span>
             </label>
             <label class="check-opt">
-              <input type="checkbox" value="noite" />
+              <input type="checkbox" class="periodo" value="noite" />
               <span>🌙 Noite</span>
-            </label>
-            <label class="check-opt">
-              <input type="checkbox" value="fds" />
-              <span>🏖️ Fins de semana</span>
             </label>
           </div>
         </div>
 
-        <button type="submit" class="btn-submit" id="btn-submit">
-          ⚡ Entrar na fábrica agora
+        <div class="field">
+          <label>DIAS_DA_SEMANA <span class="hint"> &nbsp;— preferência pessoal, sem compromisso</span></label>
+          <div class="check-group-7">
+            <label class="check-opt"><input type="checkbox" class="diasemana" value="seg" /><span>Seg</span></label>
+            <label class="check-opt"><input type="checkbox" class="diasemana" value="ter" /><span>Ter</span></label>
+            <label class="check-opt"><input type="checkbox" class="diasemana" value="qua" /><span>Qua</span></label>
+            <label class="check-opt"><input type="checkbox" class="diasemana" value="qui" /><span>Qui</span></label>
+            <label class="check-opt"><input type="checkbox" class="diasemana" value="sex" /><span>Sex</span></label>
+            <label class="check-opt"><input type="checkbox" class="diasemana" value="sab" /><span>Sáb</span></label>
+            <label class="check-opt"><input type="checkbox" class="diasemana" value="dom" /><span>Dom</span></label>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-submit" id="btn-submit" disabled>
+          <span id="btn-text">⚡ SOLICITAR_ACESSO.exe</span>
         </button>
       </form>
     </div>
@@ -446,74 +764,125 @@
 
 <footer>
   <div class="container">
-    <p>Construído com ❤️ por humanos + <strong>AIOS</strong> · AIOSTOMATIZADOR © 2026</p>
+    <p>BUILT_BY: humanos + <strong>AIOS</strong> &nbsp;|&nbsp; AIOSTOMATIZADOR © 2026 &nbsp;|&nbsp; STATUS: <span style="color:var(--z4)">ONLINE</span></p>
   </div>
 </footer>
 
 <script>
-  // ── SUPABASE — substitua pelos seus valores ──────────────────
+  // ── Supabase ─────────────────────────────────────────────────
   const SUPABASE_URL = 'https://igtaoywbhbousohwntlp.supabase.co';
   const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlndGFveXdiaGJvdXNvaHdudGxwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIwNjcwMzMsImV4cCI6MjA4NzY0MzAzM30.AiIojwakkSISnNXfMALEU_STAHgSkyRzXWrTD61UF7A';
-  // ─────────────────────────────────────────────────────────────
-
   const { createClient } = supabase;
   const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-  const cores = ['#7c3aed','#a855f7','#ef4444','#f97316',
-                 '#f59e0b','#06b6d4','#10b981','#3b82f6'];
+  // ── Cores das zonas ──────────────────────────────────────────
+  const zoneCores = ['#ef4444','#f97316','#eab308','#22c55e','#3b82f6','#a855f7','#ec4899','#06b6d4'];
+  const coreNomes = {
+    '#ef4444':'Vermelho', '#f97316':'Laranja', '#eab308':'Dourado',
+    '#22c55e':'Verde',    '#3b82f6':'Azul',    '#a855f7':'Roxo',
+    '#ec4899':'Rosa',     '#06b6d4':'Ciano'
+  };
 
-  function cor(nome) {
-    let h = 0; for (let c of nome) h += c.charCodeAt(0);
-    return cores[h % cores.length];
+  function zonaCor(nome) {
+    let h = 0;
+    for (let c of nome) h = (h * 31 + c.charCodeAt(0)) & 0xffff;
+    return zoneCores[h % zoneCores.length];
   }
   function iniciais(nome) {
     return nome.trim().split(' ').slice(0,2).map(n => n[0]).join('').toUpperCase();
   }
+  function padNum(n) { return String(n).padStart(3, '0'); }
 
+  // ── Boot sequence ────────────────────────────────────────────
+  const bootLines = ['b1','b2','b3','b4'];
+  let delay = 300;
+  bootLines.forEach(id => {
+    setTimeout(() => document.getElementById(id).classList.add('on'), delay);
+    delay += 400;
+  });
+  setTimeout(() => {
+    document.getElementById('boot-bar').style.width = '100%';
+  }, 600);
+  setTimeout(() => {
+    document.getElementById('boot').classList.add('fade');
+    setTimeout(() => document.getElementById('boot').style.display = 'none', 800);
+  }, 2200);
+
+  // ── Nomes wall ───────────────────────────────────────────────
   const grid     = document.getElementById('nomes-grid');
   const contador = document.getElementById('contador');
   let total = 0;
 
-  function adicionarNome(nome) {
+  function adicionarNome(nome, cor = null) {
     const empty = grid.querySelector('.empty-state');
     if (empty) empty.remove();
+
+    const c    = cor || zonaCor(nome);
     const chip = document.createElement('div');
     chip.className = 'name-chip';
+    chip.style.cssText = `border-color:${c}44;background:${c}0d;color:${c}`;
     chip.innerHTML = `
-      <div class="av" style="background:${cor(nome)}">${iniciais(nome)}</div>
+      <div class="chip-av" style="background:${c}">${iniciais(nome)}</div>
       <span>${nome.split(' ')[0]}</span>
     `;
     grid.prepend(chip);
     total++;
-    contador.textContent = total;
+    contador.textContent = padNum(total);
   }
 
   async function carregar() {
     const { data } = await db
       .from('inscricoes')
-      .select('nome, created_at')
+      .select('nome, created_at, cor_escolhida')
       .order('created_at', { ascending: true });
-    if (data) data.forEach(r => adicionarNome(r.nome));
+    if (data) data.forEach(r => adicionarNome(r.nome, r.cor_escolhida));
   }
 
   db.channel('inscricoes-live')
     .on('postgres_changes',
       { event: 'INSERT', schema: 'public', table: 'inscricoes' },
-      p => adicionarNome(p.new.nome)
+      p => adicionarNome(p.new.nome, p.new.cor_escolhida)
     ).subscribe();
 
+  // ── Zona toggle ──────────────────────────────────────────────
   document.getElementById('zona-radio').addEventListener('change', e => {
     document.getElementById('zona-campo').classList.toggle('visible', e.target.value === 'sim');
   });
 
+  // ── Color picker ─────────────────────────────────────────────
+  document.querySelectorAll('.color-swatch').forEach(swatch => {
+    swatch.addEventListener('click', () => {
+      document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('selected'));
+      swatch.classList.add('selected');
+      const cor = swatch.dataset.cor;
+      document.getElementById('cor_escolhida').value = cor;
+      document.getElementById('cor-preview-dot').style.background = cor;
+      document.getElementById('cor-preview-txt').textContent = '// Cor selecionada: ' + (coreNomes[cor] || cor);
+      document.getElementById('cor-preview').classList.add('on');
+    });
+  });
+
+  // ── Habilita botão após preencher nome e email ───────────────
+  const btnSubmit = document.getElementById('btn-submit');
+  ['nome','email'].forEach(id => {
+    document.getElementById(id).addEventListener('input', () => {
+      const nome  = document.getElementById('nome').value.trim();
+      const email = document.getElementById('email').value.trim();
+      btnSubmit.disabled = !(nome && email.includes('@'));
+    });
+  });
+
+  // ── Enviar ───────────────────────────────────────────────────
   document.getElementById('form-inscricao').addEventListener('submit', async e => {
     e.preventDefault();
 
-    const nome      = document.getElementById('nome').value.trim();
-    const email     = document.getElementById('email').value.trim();
-    const temZona   = document.querySelector('input[name="tem_zona"]:checked')?.value;
-    const zonaTexto = document.getElementById('zona_texto').value.trim();
-    const horarios  = [...document.querySelectorAll('.check-opt input:checked')].map(el => el.value);
+    const nome          = document.getElementById('nome').value.trim();
+    const email         = document.getElementById('email').value.trim();
+    const temZona       = document.querySelector('input[name="tem_zona"]:checked')?.value;
+    const zonaTexto     = document.getElementById('zona_texto').value.trim();
+    const cor_escolhida = document.getElementById('cor_escolhida').value || null;
+    const periodo_dia   = [...document.querySelectorAll('.periodo:checked')].map(el => el.value);
+    const dias_semana   = [...document.querySelectorAll('.diasemana:checked')].map(el => el.value);
 
     let ok = true;
     if (!nome)  { document.getElementById('err-nome').classList.add('on');  ok = false; }
@@ -522,32 +891,34 @@
     else          document.getElementById('err-email').classList.remove('on');
     if (!ok) return;
 
-    const btn = document.getElementById('btn-submit');
+    const btn  = document.getElementById('btn-submit');
+    const text = document.getElementById('btn-text');
     btn.disabled = true;
-    btn.textContent = 'Entrando na fábrica...';
+    text.textContent = '// PROCESSANDO...';
 
     const { error } = await db.from('inscricoes').insert([{
-      nome,
-      email,
-      tem_zona_genialidade: temZona === 'sim',
+      nome, email,
+      tem_zona_genialidade:  temZona === 'sim',
       zona_genialidade_texto: zonaTexto || null,
-      horario_preferido: horarios.length ? horarios : null
+      cor_escolhida,
+      periodo_dia: periodo_dia.length ? periodo_dia : null,
+      dias_semana:  dias_semana.length  ? dias_semana  : null
     }]);
 
     if (error) {
       btn.disabled = false;
-      btn.textContent = '⚡ Entrar na fábrica agora';
+      text.textContent = '⚡ SOLICITAR_ACESSO.exe';
       if (error.code === '23505') {
-        alert('Esse email já está na fábrica! 🎉');
+        alert('// Este email já está registrado na fábrica! 🎉');
       } else {
-        alert('Algo deu errado. Tente novamente.');
+        alert('// ERRO: tente novamente em instantes.');
         console.error(error);
       }
       return;
     }
 
     document.getElementById('form-inscricao').style.display = 'none';
-    document.getElementById('sucesso').classList.add('visible');
+    document.getElementById('sucesso').classList.add('on');
   });
 
   carregar();
