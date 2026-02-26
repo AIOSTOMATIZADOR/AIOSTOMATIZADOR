@@ -1200,10 +1200,16 @@
   async function carregarMensagens(cat) {
     const feed = document.getElementById('messages-feed');
     feed.innerHTML = '<div class="msg-empty">[ CARREGANDO... ]</div>';
+    ultimoTimestamp = null;
     const { data } = await db.from('mensagens').select('*').eq('categoria', cat).order('created_at', { ascending: true });
     feed.innerHTML = '';
-    if (!data || data.length === 0) { feed.innerHTML = '<div class="msg-empty">[ AGUARDANDO PRIMEIRA IDEIA... ]</div>'; return; }
+    if (!data || data.length === 0) {
+      feed.innerHTML = '<div class="msg-empty">[ AGUARDANDO PRIMEIRA IDEIA... ]</div>';
+      ultimoTimestamp = new Date().toISOString();
+      return;
+    }
     data.forEach(msg => feed.appendChild(renderMsg(msg)));
+    ultimoTimestamp = data[data.length - 1].created_at;
     feed.scrollTop = feed.scrollHeight;
   }
 
@@ -1222,21 +1228,47 @@
       </div>`).join('');
   }
 
+  let pollInterval  = null;
+  let ultimoTimestamp = null;
+
+  function adicionarMsgNaFeed(msg) {
+    const feed = document.getElementById('messages-feed');
+    if (feed.querySelector(`[data-id="${msg.id}"]`)) return; // já existe
+    const empty = feed.querySelector('.msg-empty');
+    if (empty) empty.remove();
+    feed.appendChild(renderMsg(msg));
+    feed.scrollTop = feed.scrollHeight;
+    ultimoTimestamp = msg.created_at;
+  }
+
   function subscreverChat() {
-    if (chatChannel) return; // já inscrito, não duplica
-    chatChannel = db.channel('mensagens-live')
+    // ── Realtime (entrega imediata) ───────────────────────────
+    if (chatChannel) db.removeChannel(chatChannel);
+    chatChannel = db.channel('mensagens-live-' + Date.now())
       .on('postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'mensagens' },
         p => {
-          if (p.new.categoria !== catAtual) return; // filtra no cliente
-          const feed = document.getElementById('messages-feed');
-          const empty = feed.querySelector('.msg-empty');
-          if (empty) empty.remove();
-          feed.appendChild(renderMsg(p.new));
-          feed.scrollTop = feed.scrollHeight;
+          if (p.new.categoria !== catAtual) return;
+          adicionarMsgNaFeed(p.new);
           carregarTop(catAtual);
         }
       ).subscribe();
+
+    // ── Polling fallback a cada 3s (garante entrega) ──────────
+    if (pollInterval) clearInterval(pollInterval);
+    pollInterval = setInterval(async () => {
+      if (!ultimoTimestamp) return;
+      const { data } = await db
+        .from('mensagens')
+        .select('*')
+        .eq('categoria', catAtual)
+        .gt('created_at', ultimoTimestamp)
+        .order('created_at', { ascending: true });
+      if (data && data.length > 0) {
+        data.forEach(msg => adicionarMsgNaFeed(msg));
+        carregarTop(catAtual);
+      }
+    }, 3000);
   }
 
   async function votar(id, msgEl) {
