@@ -646,6 +646,14 @@
     .top-text { font-size: 0.82rem; line-height: 1.5; color: var(--text); }
     .top-author { font-size: 0.68rem; margin-top: 3px; }
 
+    /* ── Toast de erro ─────────────────────────────────────── */
+    #erro-toast {
+      display: none; position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+      background: #ef4444; color: #fff; padding: 10px 20px; border-radius: 8px;
+      font-family: 'Space Mono', monospace; font-size: 0.78rem; z-index: 9999;
+      box-shadow: 0 4px 20px rgba(239,68,68,0.4);
+    }
+
     /* ── Footer ────────────────────────────────────────────── */
     footer {
       text-align: center; padding: 40px 0;
@@ -1078,6 +1086,8 @@
 
 </div>
 
+<div id="erro-toast"></div>
+
 <footer>
   <div class="container">
     <p>BUILT_BY: humanos + <strong>AIOS</strong> &nbsp;|&nbsp; AIOSTOMATIZADOR © 2026 &nbsp;|&nbsp; STATUS: <span style="color:var(--z4)">ONLINE</span></p>
@@ -1292,6 +1302,12 @@
     const u = localStorage.getItem('aios_user');
     return u ? (JSON.parse(u).cor || '#06b6d4') : '#06b6d4';
   }
+  function mostrarErro(msg) {
+    const t = document.getElementById('erro-toast');
+    t.textContent = msg; t.style.display = 'block';
+    setTimeout(() => t.style.display = 'none', 5000);
+  }
+
   function votosLocais() { return JSON.parse(localStorage.getItem('aios_votos') || '[]'); }
   function registrarVoto(id) {
     const v = votosLocais(); v.push(id);
@@ -1300,18 +1316,28 @@
   function jaVotou(id) { return votosLocais().includes(id); }
 
   function tempoRelativo(ts) {
-    // Normaliza qualquer formato do Supabase para ISO 8601 válido
-    let str = String(ts)
-      .replace(' ', 'T')        // "2026-02-26 20:00" → "2026-02-26T20:00"
-      .replace(/\+00$/, 'Z')    // "+00" → "Z"
-      .replace(/\+00:00$/, 'Z');// "+00:00" → "Z"
-    if (!str.endsWith('Z') && !str.match(/[+-]\d{2}:\d{2}$/)) str += 'Z';
-    const diff = Math.floor((Date.now() - new Date(str)) / 1000);
-    if (diff < 120) return 'agora';
+    // Aceita qualquer formato do Supabase: com espaço, +00, +00:00, microsegundos, sem tz
+    const str = String(ts)
+      .replace(' ', 'T')
+      .replace(/\+00(:\d{2})?(\.\d+)?$/, 'Z')
+      .replace(/(\.\d{1,6})Z$/, 'Z')
+      .replace(/(\.\d{1,6})$/, '');
+    const normalized = str.endsWith('Z') || /[+-]\d{2}:\d{2}$/.test(str) ? str : str + 'Z';
+    const d = new Date(normalized);
+    if (isNaN(d.getTime())) return '?';
+    const diff = Math.floor((Date.now() - d.getTime()) / 1000);
+    if (diff < 60)   return 'agora';
     if (diff < 3600) return Math.floor(diff / 60) + 'min';
     if (diff < 86400) return Math.floor(diff / 3600) + 'h';
     return Math.floor(diff / 86400) + 'd';
   }
+
+  // Atualiza todos os timestamps visíveis a cada 60s
+  setInterval(() => {
+    document.querySelectorAll('.msg-time[data-ts]').forEach(el => {
+      el.textContent = tempoRelativo(el.dataset.ts);
+    });
+  }, 60000);
 
   function renderMsg(msg) {
     const div = document.createElement('div');
@@ -1335,7 +1361,7 @@
       <div class="msg-body">
         <div class="msg-meta">
           <span class="msg-name" style="color:${cor}">${msg.nome.split(' ')[0]}</span>
-          <span class="msg-time">${tempoRelativo(msg.created_at)}</span>
+          <span class="msg-time" data-ts="${msg.created_at}">${tempoRelativo(msg.created_at)}</span>
         </div>
         ${quotedHtml}
         <div class="msg-text">${msg.texto}</div>
@@ -1436,7 +1462,7 @@
       .update({ votos: novoCount })
       .eq('id', id);
     if (error) {
-      console.error('Erro ao votar:', error);
+      mostrarErro('ERRO: ' + (error.message || error.code || JSON.stringify(error)));
       const v = votosLocais().filter(x => x !== String(id));
       localStorage.setItem('aios_votos', JSON.stringify(v));
       btn.classList.remove('voted');
