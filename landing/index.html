@@ -477,6 +477,97 @@
     .err { color: #ef4444; font-family: 'Space Mono', monospace; font-size: 0.7rem; margin-top: 6px; letter-spacing: 1px; display: none; }
     .err.on { display: block; }
 
+    /* ── Chat Section ──────────────────────────────────────── */
+    #chat-section { display: none; padding: 80px 0 0; }
+    .chat-intro { margin-bottom: 48px; }
+
+    .cat-legend {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 28px 0;
+    }
+    @media(max-width:600px) { .cat-legend { grid-template-columns: 1fr; } }
+    .cat-legend-item {
+      display: flex; align-items: flex-start; gap: 12px;
+      background: rgba(0,212,255,0.03); border: 1px solid var(--border);
+      border-radius: 6px; padding: 14px 16px;
+    }
+    .cat-legend-icon { font-size: 1.3rem; flex-shrink: 0; }
+    .cat-legend-name { font-family: 'Space Mono', monospace; font-size: 0.72rem; letter-spacing: 1px; color: var(--z8); margin-bottom: 4px; }
+    .cat-legend-desc { font-size: 0.8rem; color: var(--muted); line-height: 1.5; }
+
+    .how-to-box {
+      background: rgba(168,85,247,0.06); border: 1px solid rgba(168,85,247,0.2);
+      border-radius: 6px; padding: 20px 24px; margin-top: 8px;
+    }
+    .how-to-box h4 { font-family: 'Space Mono', monospace; font-size: 0.78rem; color: var(--z6); letter-spacing: 1px; margin-bottom: 12px; }
+    .how-to-box ol { padding-left: 18px; }
+    .how-to-box li { font-size: 0.84rem; color: var(--muted); line-height: 2; }
+    .how-to-box strong { color: var(--text); }
+
+    .cat-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+    .cat-tab {
+      font-family: 'Space Mono', monospace; font-size: 0.68rem; letter-spacing: 1px;
+      padding: 8px 14px; border-radius: 4px;
+      border: 1px solid var(--border); background: transparent; color: var(--muted);
+      cursor: pointer; transition: all 0.2s;
+    }
+    .cat-tab:hover { border-color: rgba(0,212,255,0.3); color: var(--text); }
+    .cat-tab.active { border-color: var(--z8); color: var(--z8); background: rgba(6,182,212,0.08); box-shadow: 0 0 12px rgba(6,182,212,0.15); }
+
+    .chat-ui { display: grid; grid-template-columns: 1fr 290px; gap: 20px; align-items: start; }
+    @media(max-width:768px) { .chat-ui { grid-template-columns: 1fr; } }
+
+    .chat-main { background: rgba(0,212,255,0.03); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+    .messages-feed {
+      height: 420px; overflow-y: auto; padding: 20px;
+      display: flex; flex-direction: column; gap: 16px;
+      scrollbar-width: thin; scrollbar-color: rgba(0,212,255,0.2) transparent;
+    }
+    .msg-empty { text-align: center; color: var(--muted); font-family: 'Space Mono', monospace; font-size: 0.72rem; letter-spacing: 1px; padding: 60px 0; }
+    .msg { display: flex; gap: 12px; align-items: flex-start; }
+    .msg-av {
+      width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.68rem; font-weight: 700; font-family: 'Space Mono', monospace; color: #000;
+    }
+    .msg-body { flex: 1; min-width: 0; }
+    .msg-meta { display: flex; align-items: center; gap: 10px; margin-bottom: 5px; }
+    .msg-name { font-family: 'Space Mono', monospace; font-size: 0.72rem; font-weight: 700; }
+    .msg-time { font-size: 0.65rem; color: var(--muted); }
+    .msg-text { font-size: 0.87rem; line-height: 1.65; color: var(--text); word-break: break-word; }
+    .msg-actions { margin-top: 8px; }
+    .btn-vote {
+      background: transparent; border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 20px; padding: 4px 12px; cursor: pointer;
+      font-size: 0.76rem; color: var(--muted); transition: all 0.2s;
+      display: inline-flex; align-items: center; gap: 5px;
+    }
+    .btn-vote:hover { border-color: rgba(239,68,68,0.4); color: #ef4444; }
+    .btn-vote.voted { border-color: rgba(239,68,68,0.5); color: #ef4444; background: rgba(239,68,68,0.08); cursor: default; }
+
+    .chat-input-row { display: flex; border-top: 1px solid var(--border); }
+    .chat-input-row input {
+      flex: 1; padding: 14px 16px;
+      background: transparent; border: none; outline: none;
+      color: var(--text); font-family: 'Inter', sans-serif; font-size: 0.87rem;
+    }
+    .chat-input-row input::placeholder { color: var(--muted); }
+    .btn-send {
+      padding: 14px 18px; background: transparent;
+      border: none; border-left: 1px solid var(--border);
+      color: var(--z8); font-family: 'Space Mono', monospace;
+      font-size: 0.72rem; letter-spacing: 1px; cursor: pointer; transition: background 0.2s; white-space: nowrap;
+    }
+    .btn-send:hover { background: rgba(6,182,212,0.08); }
+
+    .chat-sidebar { background: rgba(0,212,255,0.03); border: 1px solid var(--border); border-radius: 8px; padding: 20px; position: sticky; top: 20px; }
+    .sidebar-title { font-family: 'Space Mono', monospace; font-size: 0.7rem; letter-spacing: 2px; color: var(--z3); margin-bottom: 16px; }
+    .top-empty { color: var(--muted); font-size: 0.8rem; text-align: center; padding: 20px 0; }
+    .top-item { display: flex; gap: 12px; align-items: flex-start; padding: 12px 0; border-bottom: 1px solid var(--border); }
+    .top-item:last-child { border-bottom: none; }
+    .top-fire { font-family: 'Space Mono', monospace; font-size: 0.75rem; color: #ef4444; min-width: 38px; padding-top: 2px; }
+    .top-text { font-size: 0.82rem; line-height: 1.5; color: var(--text); }
+    .top-author { font-size: 0.68rem; margin-top: 3px; }
+
     /* ── Footer ────────────────────────────────────────────── */
     footer {
       text-align: center; padding: 40px 0;
@@ -781,6 +872,93 @@
     </div>
   </section>
 
+
+  <!-- ── Chat Section ──────────────────────────────────────────── -->
+  <section id="chat-section">
+
+    <div class="divider"></div>
+
+    <div class="chat-intro">
+      <p class="sec-tag">// ideias.fabrica</p>
+      <h2 class="sec-title">A fábrica é construída por todos.</h2>
+      <p class="sec-sub">Aqui você contribui com ideias para moldar como o AIOSTOMATIZADOR vai funcionar. Cada voz importa — as ideias mais votadas sobem para o topo.</p>
+
+      <div class="cat-legend">
+        <div class="cat-legend-item">
+          <span class="cat-legend-icon">💡</span>
+          <div><div class="cat-legend-name">IDEIAS</div><div class="cat-legend-desc">Sugestões gerais que ainda não têm lugar certo. Não sabe onde encaixar? Coloca aqui.</div></div>
+        </div>
+        <div class="cat-legend-item">
+          <span class="cat-legend-icon">🏗️</span>
+          <div><div class="cat-legend-name">PRODUTO</div><div class="cat-legend-desc">O que construir, quais features criar, melhorias na plataforma.</div></div>
+        </div>
+        <div class="cat-legend-item">
+          <span class="cat-legend-icon">🎨</span>
+          <div><div class="cat-legend-name">DESIGN</div><div class="cat-legend-desc">Visual, identidade, experiência do usuário, como as coisas aparecem.</div></div>
+        </div>
+        <div class="cat-legend-item">
+          <span class="cat-legend-icon">⚙️</span>
+          <div><div class="cat-legend-name">TECNOLOGIA</div><div class="cat-legend-desc">Ferramentas, código, infraestrutura, stack técnica.</div></div>
+        </div>
+        <div class="cat-legend-item">
+          <span class="cat-legend-icon">🤝</span>
+          <div><div class="cat-legend-name">PESSOAS</div><div class="cat-legend-desc">Times, colaboração, como nos organizamos e trabalhamos juntos.</div></div>
+        </div>
+        <div class="cat-legend-item">
+          <span class="cat-legend-icon">📣</span>
+          <div><div class="cat-legend-name">MARKETING</div><div class="cat-legend-desc">Divulgação, crescimento, como chegamos em mais gente.</div></div>
+        </div>
+        <div class="cat-legend-item">
+          <span class="cat-legend-icon">💰</span>
+          <div><div class="cat-legend-name">FINANCEIRO</div><div class="cat-legend-desc">Custos, receita, pool de API, como a fábrica se sustenta.</div></div>
+        </div>
+        <div class="cat-legend-item">
+          <span class="cat-legend-icon">📋</span>
+          <div><div class="cat-legend-name">OPERAÇÕES</div><div class="cat-legend-desc">Processos, regras, como a fábrica funciona no dia a dia.</div></div>
+        </div>
+      </div>
+
+      <div class="how-to-box">
+        <h4>// COMO_USAR.md</h4>
+        <ol>
+          <li>Escolha a <strong>aba da categoria</strong> onde sua ideia se encaixa melhor</li>
+          <li>Digite sua ideia no campo abaixo do chat e clique <strong>ENVIAR</strong></li>
+          <li>Vote nas ideias que você acha genial clicando no <strong>🔥</strong></li>
+          <li>As mais votadas sobem automaticamente para o <strong>TOP IDEIAS</strong> na lateral</li>
+          <li>Você só pode votar <strong>uma vez</strong> em cada ideia</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="cat-tabs">
+      <button class="cat-tab active" data-cat="ideias">💡 Ideias</button>
+      <button class="cat-tab" data-cat="produto">🏗️ Produto</button>
+      <button class="cat-tab" data-cat="design">🎨 Design</button>
+      <button class="cat-tab" data-cat="tecnologia">⚙️ Tecnologia</button>
+      <button class="cat-tab" data-cat="pessoas">🤝 Pessoas</button>
+      <button class="cat-tab" data-cat="marketing">📣 Marketing</button>
+      <button class="cat-tab" data-cat="financeiro">💰 Financeiro</button>
+      <button class="cat-tab" data-cat="operacoes">📋 Operações</button>
+    </div>
+
+    <div class="chat-ui">
+      <div class="chat-main hud">
+        <div class="messages-feed" id="messages-feed">
+          <div class="msg-empty">[ AGUARDANDO PRIMEIRA IDEIA... ]</div>
+        </div>
+        <div class="chat-input-row">
+          <input type="text" id="msg-input" placeholder="Digite sua ideia aqui..." maxlength="280" />
+          <button class="btn-send" id="btn-send">ENVIAR ⚡</button>
+        </div>
+      </div>
+      <div class="chat-sidebar hud">
+        <div class="sidebar-title">🏆 TOP_IDEIAS</div>
+        <div id="top-ideas"><p class="top-empty">Nenhum voto ainda.</p></div>
+      </div>
+    </div>
+
+  </section>
+
 </div>
 
 <footer>
@@ -936,9 +1114,153 @@
 
     document.getElementById('form-inscricao').style.display = 'none';
     document.getElementById('sucesso').classList.add('on');
+    localStorage.setItem('aios_user', JSON.stringify({ nome, cor: cor_escolhida || '#06b6d4' }));
+    setTimeout(() => mostrarChat(), 1200);
   });
 
   carregar();
+
+  // ── Chat ─────────────────────────────────────────────────────
+  let catAtual = 'ideias';
+  let chatChannel = null;
+
+  function nomeUsuario() {
+    const u = localStorage.getItem('aios_user');
+    return u ? JSON.parse(u).nome : 'Anônimo';
+  }
+  function corUsuario() {
+    const u = localStorage.getItem('aios_user');
+    return u ? (JSON.parse(u).cor || '#06b6d4') : '#06b6d4';
+  }
+  function votosLocais() { return JSON.parse(localStorage.getItem('aios_votos') || '[]'); }
+  function registrarVoto(id) {
+    const v = votosLocais(); v.push(id);
+    localStorage.setItem('aios_votos', JSON.stringify(v));
+  }
+  function jaVotou(id) { return votosLocais().includes(id); }
+
+  function tempoRelativo(ts) {
+    const diff = Math.floor((Date.now() - new Date(ts)) / 1000);
+    if (diff < 60) return 'agora';
+    if (diff < 3600) return Math.floor(diff/60) + 'min';
+    if (diff < 86400) return Math.floor(diff/3600) + 'h';
+    return Math.floor(diff/86400) + 'd';
+  }
+
+  function renderMsg(msg) {
+    const div = document.createElement('div');
+    div.className = 'msg';
+    div.dataset.id = msg.id;
+    const cor = msg.cor || '#06b6d4';
+    const ini = msg.nome.trim().split(' ').slice(0,2).map(n => n[0]).join('').toUpperCase();
+    const voted = jaVotou(msg.id);
+    div.innerHTML = `
+      <div class="msg-av" style="background:${cor}">${ini}</div>
+      <div class="msg-body">
+        <div class="msg-meta">
+          <span class="msg-name" style="color:${cor}">${msg.nome.split(' ')[0]}</span>
+          <span class="msg-time">${tempoRelativo(msg.created_at)}</span>
+        </div>
+        <div class="msg-text">${msg.texto}</div>
+        <div class="msg-actions">
+          <button class="btn-vote${voted ? ' voted' : ''}" data-id="${msg.id}">
+            🔥 <span class="voto-count">${msg.votos}</span>
+          </button>
+        </div>
+      </div>`;
+    div.querySelector('.btn-vote').addEventListener('click', () => votar(msg.id, div));
+    return div;
+  }
+
+  async function carregarMensagens(cat) {
+    const feed = document.getElementById('messages-feed');
+    feed.innerHTML = '<div class="msg-empty">[ CARREGANDO... ]</div>';
+    const { data } = await db.from('mensagens').select('*').eq('categoria', cat).order('created_at', { ascending: true });
+    feed.innerHTML = '';
+    if (!data || data.length === 0) { feed.innerHTML = '<div class="msg-empty">[ AGUARDANDO PRIMEIRA IDEIA... ]</div>'; return; }
+    data.forEach(msg => feed.appendChild(renderMsg(msg)));
+    feed.scrollTop = feed.scrollHeight;
+  }
+
+  async function carregarTop(cat) {
+    const { data } = await db.from('mensagens').select('*').eq('categoria', cat).order('votos', { ascending: false }).limit(5);
+    const el = document.getElementById('top-ideas');
+    const itens = (data || []).filter(d => d.votos > 0);
+    if (itens.length === 0) { el.innerHTML = '<p class="top-empty">Nenhum voto ainda.</p>'; return; }
+    el.innerHTML = itens.map(d => `
+      <div class="top-item">
+        <div class="top-fire">🔥${d.votos}</div>
+        <div>
+          <div class="top-text">${d.texto}</div>
+          <div class="top-author" style="color:${d.cor||'#06b6d4'}">${d.nome.split(' ')[0]}</div>
+        </div>
+      </div>`).join('');
+  }
+
+  function subscreverChat(cat) {
+    if (chatChannel) db.removeChannel(chatChannel);
+    chatChannel = db.channel('chat-' + cat)
+      .on('postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'mensagens', filter: `categoria=eq.${cat}` },
+        p => {
+          const feed = document.getElementById('messages-feed');
+          const empty = feed.querySelector('.msg-empty');
+          if (empty) empty.remove();
+          feed.appendChild(renderMsg(p.new));
+          feed.scrollTop = feed.scrollHeight;
+        }
+      ).subscribe();
+  }
+
+  async function votar(id, msgEl) {
+    if (jaVotou(id)) return;
+    registrarVoto(id);
+    const btn = msgEl.querySelector('.btn-vote');
+    btn.classList.add('voted');
+    const countEl = btn.querySelector('.voto-count');
+    const novoCount = parseInt(countEl.textContent) + 1;
+    countEl.textContent = novoCount;
+    await db.from('mensagens').update({ votos: novoCount }).eq('id', id);
+    carregarTop(catAtual);
+  }
+
+  async function enviarMensagem() {
+    const input = document.getElementById('msg-input');
+    const texto = input.value.trim();
+    if (!texto) return;
+    input.value = '';
+    await db.from('mensagens').insert([{ nome: nomeUsuario(), cor: corUsuario(), categoria: catAtual, texto, votos: 0 }]);
+  }
+
+  function mostrarChat() {
+    const s = document.getElementById('chat-section');
+    s.style.display = 'block';
+    carregarMensagens(catAtual);
+    carregarTop(catAtual);
+    subscreverChat(catAtual);
+    s.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  document.querySelectorAll('.cat-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      catAtual = tab.dataset.cat;
+      carregarMensagens(catAtual);
+      carregarTop(catAtual);
+      subscreverChat(catAtual);
+    });
+  });
+
+  document.getElementById('btn-send').addEventListener('click', enviarMensagem);
+  document.getElementById('msg-input').addEventListener('keydown', e => { if (e.key === 'Enter') enviarMensagem(); });
+
+  // Mostra chat se já se inscreveu antes
+  if (localStorage.getItem('aios_user')) {
+    document.getElementById('form-inscricao').style.display = 'none';
+    document.getElementById('sucesso').classList.add('on');
+    mostrarChat();
+  }
 </script>
 </body>
 </html>
