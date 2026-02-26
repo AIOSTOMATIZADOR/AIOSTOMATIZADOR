@@ -589,6 +589,39 @@
     .btn-vote:hover { border-color: rgba(239,68,68,0.4); color: #ef4444; }
     .btn-vote.voted { border-color: rgba(239,68,68,0.5); color: #ef4444; background: rgba(239,68,68,0.08); cursor: default; }
 
+    .reply-bar {
+      display: none; align-items: center; gap: 10px;
+      padding: 10px 16px; border-top: 1px solid var(--border);
+      background: rgba(168,85,247,0.06);
+    }
+    .reply-bar.on { display: flex; }
+    .reply-bar-text {
+      flex: 1; font-size: 0.78rem; color: var(--muted);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .reply-bar-text strong { color: var(--z6); font-family: 'Space Mono', monospace; font-size: 0.72rem; }
+    .reply-bar-close {
+      background: none; border: none; color: var(--muted);
+      cursor: pointer; font-size: 1rem; line-height: 1; padding: 0 4px;
+      flex-shrink: 0;
+    }
+    .reply-bar-close:hover { color: #ef4444; }
+
+    .quoted-msg {
+      border-left: 3px solid var(--z6); padding: 6px 10px;
+      margin-bottom: 8px; border-radius: 0 4px 4px 0;
+      background: rgba(168,85,247,0.06);
+    }
+    .quoted-nome { font-family: 'Space Mono', monospace; font-size: 0.68rem; color: var(--z6); margin-bottom: 3px; }
+    .quoted-texto { font-size: 0.8rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    .btn-reply {
+      background: none; border: none; color: var(--muted);
+      cursor: pointer; font-size: 0.78rem; padding: 0 6px;
+      transition: color 0.2s;
+    }
+    .btn-reply:hover { color: var(--z6); }
+
     .chat-input-row { display: flex; border-top: 1px solid var(--border); }
     .chat-input-row input {
       flex: 1; padding: 14px 16px;
@@ -1026,6 +1059,10 @@
         <div class="messages-feed" id="messages-feed">
           <div class="msg-empty">[ AGUARDANDO PRIMEIRA IDEIA... ]</div>
         </div>
+        <div class="reply-bar" id="reply-bar">
+          <div class="reply-bar-text">↩ <strong id="reply-nome"></strong>: <span id="reply-texto"></span></div>
+          <button class="reply-bar-close" id="reply-close">✕</button>
+        </div>
         <div class="chat-input-row">
           <input type="text" id="msg-input" placeholder="Digite sua ideia aqui..." />
           <button class="btn-send" id="btn-send">ENVIAR ⚡</button>
@@ -1273,10 +1310,15 @@
     div.dataset.id = msg.id;
     const cor = msg.cor || '#06b6d4';
     const ini = msg.nome.trim().split(' ').slice(0,2).map(n => n[0]).join('').toUpperCase();
-    const voted   = jaVotou(msg.id);
-    const proprio = msg.nome === nomeUsuario();
+    const voted    = jaVotou(msg.id);
+    const proprio  = msg.nome === nomeUsuario();
     const voteBloq = voted || proprio;
     const voteTitle = proprio ? 'Você não pode votar na própria ideia' : '';
+    const quotedHtml = msg.reply_preview ? `
+      <div class="quoted-msg">
+        <div class="quoted-nome">↩ ${msg.reply_nome || ''}</div>
+        <div class="quoted-texto">${msg.reply_preview}</div>
+      </div>` : '';
     div.innerHTML = `
       <div class="msg-av" style="background:${cor}">${ini}</div>
       <div class="msg-body">
@@ -1284,14 +1326,24 @@
           <span class="msg-name" style="color:${cor}">${msg.nome.split(' ')[0]}</span>
           <span class="msg-time">${tempoRelativo(msg.created_at)}</span>
         </div>
+        ${quotedHtml}
         <div class="msg-text">${msg.texto}</div>
         <div class="msg-actions">
           <button class="btn-vote${voteBloq ? ' voted' : ''}" data-id="${msg.id}" title="${voteTitle}" ${proprio ? 'disabled' : ''}>
             🔥 <span class="voto-count">${msg.votos}</span>
           </button>
+          <button class="btn-reply" data-id="${msg.id}" data-nome="${msg.nome.split(' ')[0]}" data-texto="${msg.texto.substring(0,80)}">↩</button>
         </div>
       </div>`;
     div.querySelector('.btn-vote').addEventListener('click', () => votar(msg.id, div));
+    div.querySelector('.btn-reply').addEventListener('click', e => {
+      const btn = e.currentTarget;
+      replyingTo = { id: btn.dataset.id, nome: btn.dataset.nome, texto: btn.dataset.texto };
+      document.getElementById('reply-nome').textContent  = replyingTo.nome;
+      document.getElementById('reply-texto').textContent = replyingTo.texto;
+      document.getElementById('reply-bar').classList.add('on');
+      document.getElementById('msg-input').focus();
+    });
     return div;
   }
 
@@ -1326,8 +1378,9 @@
       </div>`).join('');
   }
 
-  let pollInterval  = null;
+  let pollInterval    = null;
   let ultimoTimestamp = null;
+  let replyingTo      = null; // { id, nome, texto }
 
   function adicionarMsgNaFeed(msg) {
     const feed = document.getElementById('messages-feed');
@@ -1387,11 +1440,19 @@
     const texto = input.value.trim();
     if (!texto) return;
     input.value = '';
-    const { data } = await db
-      .from('mensagens')
-      .insert([{ nome: nomeUsuario(), cor: corUsuario(), categoria: catAtual, texto, votos: 0 }])
-      .select()
-      .single();
+
+    const payload = {
+      nome: nomeUsuario(), cor: corUsuario(),
+      categoria: catAtual, texto, votos: 0,
+      reply_to:      replyingTo ? replyingTo.id      : null,
+      reply_nome:    replyingTo ? replyingTo.nome     : null,
+      reply_preview: replyingTo ? replyingTo.texto    : null,
+    };
+
+    replyingTo = null;
+    document.getElementById('reply-bar').classList.remove('on');
+
+    const { data } = await db.from('mensagens').insert([payload]).select().single();
     if (data) adicionarMsgNaFeed(data);
   }
 
@@ -1417,6 +1478,10 @@
 
   document.getElementById('btn-send').addEventListener('click', enviarMensagem);
   document.getElementById('msg-input').addEventListener('keydown', e => { if (e.key === 'Enter') enviarMensagem(); });
+  document.getElementById('reply-close').addEventListener('click', () => {
+    replyingTo = null;
+    document.getElementById('reply-bar').classList.remove('on');
+  });
 
   // ── Retorno por email ────────────────────────────────────────
   document.getElementById('btn-retorno').addEventListener('click', async () => {
