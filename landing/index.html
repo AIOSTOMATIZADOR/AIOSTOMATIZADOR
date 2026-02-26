@@ -558,6 +558,15 @@
     .cat-tab:hover { border-color: rgba(0,212,255,0.3); color: var(--text); }
     .cat-tab.active { border-color: var(--z8); color: var(--z8); background: rgba(6,182,212,0.08); box-shadow: 0 0 12px rgba(6,182,212,0.15); }
 
+    .chat-tz-bar {
+      font-family: 'Space Mono', monospace; font-size: 0.68rem;
+      color: var(--muted); margin-bottom: 10px; padding: 6px 10px;
+      border: 1px solid var(--border); border-radius: 6px;
+      background: rgba(0,212,255,0.03);
+    }
+    .chat-tz-bar strong { color: var(--text); }
+    #relogio-local { color: #06b6d4; font-weight: 700; }
+
     .chat-ui { display: grid; grid-template-columns: 1fr 290px; gap: 20px; align-items: start; }
     @media(max-width:768px) { .chat-ui { grid-template-columns: 1fr; } }
 
@@ -1062,6 +1071,10 @@
       <button class="cat-tab" data-cat="operacoes">📋 Operações</button>
     </div>
 
+    <div class="chat-tz-bar">
+      ⏱ Horários no <strong>fuso do seu dispositivo</strong> &nbsp;·&nbsp; Agora: <span id="relogio-local"></span>
+    </div>
+
     <div class="chat-ui">
       <div class="chat-main hud">
         <div class="messages-feed" id="messages-feed">
@@ -1332,6 +1345,14 @@
     if (d.toDateString() === ontem.toDateString()) return 'ontem ' + hora;
     return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }) + ' ' + hora;
   }
+
+  // Relógio em tempo real na barra de fuso
+  function atualizarRelogio() {
+    const el = document.getElementById('relogio-local');
+    if (el) el.textContent = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  }
+  atualizarRelogio();
+  setInterval(atualizarRelogio, 1000);
 
   // Atualiza "agora" → hora exata após 1 minuto
   setInterval(() => {
