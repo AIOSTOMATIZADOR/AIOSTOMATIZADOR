@@ -1328,26 +1328,33 @@
   }
   function jaVotou(id) { return votosLocais().includes(id); }
 
-  function parseTS(ts) {
-    // new Date() entende ISO 8601 nativamente; só precisa trocar espaço por T
-    return new Date(String(ts).replace(' ', 'T'));
-  }
-
   const TZ = 'America/Sao_Paulo';
+
+  function parseTS(ts) {
+    if (!ts) return new Date(NaN);
+    // Remove microsegundos, normaliza espaço→T e +00→+00:00
+    const s = String(ts)
+      .replace(' ', 'T')
+      .replace(/\.\d+/, '')
+      .replace(/\+00$/, '+00:00');
+    // Se não tem fuso explícito, assume UTC
+    const norm = (s.includes('+') || s.endsWith('Z')) ? s : s + 'Z';
+    return new Date(norm);
+  }
 
   function tempoRelativo(ts) {
     const d = parseTS(ts);
     if (isNaN(d.getTime())) return '?';
     const agora = new Date();
     if ((agora - d) < 60000) return 'agora';
-    const hora = d.toLocaleTimeString('pt-BR', { timeZone: TZ, hour: '2-digit', minute: '2-digit', second: '2-digit' });
-    const diaStr  = d.toLocaleDateString('pt-BR',    { timeZone: TZ });
-    const hojeStr = agora.toLocaleDateString('pt-BR', { timeZone: TZ });
-    const ontemDate = new Date(agora); ontemDate.setDate(ontemDate.getDate() - 1);
-    const ontemStr = ontemDate.toLocaleDateString('pt-BR', { timeZone: TZ });
-    if (diaStr === hojeStr)   return hora;
-    if (diaStr === ontemStr)  return 'ontem ' + hora;
-    return d.toLocaleDateString('pt-BR', { timeZone: TZ, day: '2-digit', month: '2-digit' }) + ' ' + hora;
+    const horaMin = d.toLocaleTimeString('pt-BR', { timeZone: TZ, hour: '2-digit', minute: '2-digit' });
+    const diaStr   = d.toLocaleDateString('pt-BR',    { timeZone: TZ });
+    const hojeStr  = agora.toLocaleDateString('pt-BR', { timeZone: TZ });
+    const ontem    = new Date(agora.getFullYear(), agora.getMonth(), agora.getDate() - 1);
+    const ontemStr = ontem.toLocaleDateString('pt-BR', { timeZone: TZ });
+    if (diaStr === hojeStr)  return horaMin;
+    if (diaStr === ontemStr) return 'ontem ' + horaMin;
+    return d.toLocaleDateString('pt-BR', { timeZone: TZ, day: '2-digit', month: '2-digit' }) + ' ' + horaMin;
   }
 
   // Atualiza "agora" → hora exata após 1 minuto
