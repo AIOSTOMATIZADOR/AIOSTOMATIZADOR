@@ -1072,7 +1072,7 @@
     </div>
 
     <div class="chat-tz-bar">
-      ⏱ Horários no <strong>fuso do seu dispositivo</strong> &nbsp;·&nbsp; Agora: <span id="relogio-local"></span>
+      ⏱ Horários no <strong>horário de Brasília</strong> (BRT)
     </div>
 
     <div class="chat-ui">
@@ -1333,26 +1333,22 @@
     return new Date(String(ts).replace(' ', 'T'));
   }
 
+  const TZ = 'America/Sao_Paulo';
+
   function tempoRelativo(ts) {
     const d = parseTS(ts);
     if (isNaN(d.getTime())) return '?';
     const agora = new Date();
     if ((agora - d) < 60000) return 'agora';
-    // Hora com segundos no timezone do navegador do usuário
-    const hora = d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-    if (d.toDateString() === agora.toDateString()) return hora;
-    const ontem = new Date(agora); ontem.setDate(ontem.getDate() - 1);
-    if (d.toDateString() === ontem.toDateString()) return 'ontem ' + hora;
-    return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }) + ' ' + hora;
+    const hora = d.toLocaleTimeString('pt-BR', { timeZone: TZ, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    const diaStr  = d.toLocaleDateString('pt-BR',    { timeZone: TZ });
+    const hojeStr = agora.toLocaleDateString('pt-BR', { timeZone: TZ });
+    const ontemDate = new Date(agora); ontemDate.setDate(ontemDate.getDate() - 1);
+    const ontemStr = ontemDate.toLocaleDateString('pt-BR', { timeZone: TZ });
+    if (diaStr === hojeStr)   return hora;
+    if (diaStr === ontemStr)  return 'ontem ' + hora;
+    return d.toLocaleDateString('pt-BR', { timeZone: TZ, day: '2-digit', month: '2-digit' }) + ' ' + hora;
   }
-
-  // Relógio em tempo real na barra de fuso
-  function atualizarRelogio() {
-    const el = document.getElementById('relogio-local');
-    if (el) el.textContent = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-  }
-  atualizarRelogio();
-  setInterval(atualizarRelogio, 1000);
 
   // Atualiza "agora" → hora exata após 1 minuto
   setInterval(() => {
