@@ -1316,26 +1316,24 @@
   function jaVotou(id) { return votosLocais().includes(id); }
 
   function parseTS(ts) {
-    const s = String(ts).replace(' ', 'T').replace(/\+00(:\d{2})?$/, 'Z');
-    const norm = (s.endsWith('Z') || /[+-]\d{2}:\d{2}$/.test(s)) ? s : s + 'Z';
-    return new Date(norm);
+    // new Date() entende ISO 8601 nativamente; só precisa trocar espaço por T
+    return new Date(String(ts).replace(' ', 'T'));
   }
 
   function tempoRelativo(ts) {
     const d = parseTS(ts);
     if (isNaN(d.getTime())) return '?';
     const agora = new Date();
-    const diffSeg = Math.floor((agora - d) / 1000);
-    if (diffSeg < 60) return 'agora';
-    const opts = { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit' };
-    const hora = d.toLocaleTimeString('pt-BR', opts);
+    if ((agora - d) < 60000) return 'agora';
+    // Hora com segundos no timezone do navegador do usuário
+    const hora = d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
     if (d.toDateString() === agora.toDateString()) return hora;
     const ontem = new Date(agora); ontem.setDate(ontem.getDate() - 1);
     if (d.toDateString() === ontem.toDateString()) return 'ontem ' + hora;
-    return d.toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo', day: '2-digit', month: '2-digit' }) + ' ' + hora;
+    return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }) + ' ' + hora;
   }
 
-  // Atualiza timestamps a cada 30s (para "agora" virar hora exata)
+  // Atualiza "agora" → hora exata após 1 minuto
   setInterval(() => {
     document.querySelectorAll('.msg-time[data-ts]').forEach(el => {
       el.textContent = tempoRelativo(el.dataset.ts);
