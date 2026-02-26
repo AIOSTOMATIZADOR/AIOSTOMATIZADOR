@@ -1348,19 +1348,26 @@
 
   function tempoRelativo(ts) {
     const d = parseTS(ts);
-    if (isNaN(d.getTime())) return '[ERRO:' + ts + ']';
-    // DEBUG: mostra raw + parsed UTC + BRT
-    return '[RAW:' + String(ts).slice(11,19) + ' | UTC:' + d.toISOString().slice(11,19) + ' | BRT:' + d.toLocaleTimeString('pt-BR',{timeZone:TZ,hour:'2-digit',minute:'2-digit'}) + ']';
+    if (isNaN(d.getTime())) return '?';
     const agora = new Date();
     if ((agora - d) < 60000) return 'agora';
-    const horaMin = d.toLocaleTimeString('pt-BR', { timeZone: TZ, hour: '2-digit', minute: '2-digit' });
-    const diaStr   = d.toLocaleDateString('pt-BR',    { timeZone: TZ });
-    const hojeStr  = agora.toLocaleDateString('pt-BR', { timeZone: TZ });
-    const ontem    = new Date(agora.getFullYear(), agora.getMonth(), agora.getDate() - 1);
-    const ontemStr = ontem.toLocaleDateString('pt-BR', { timeZone: TZ });
-    if (diaStr === hojeStr)  return horaMin;
-    if (diaStr === ontemStr) return 'ontem ' + horaMin;
-    return d.toLocaleDateString('pt-BR', { timeZone: TZ, day: '2-digit', month: '2-digit' }) + ' ' + horaMin;
+
+    // BRT = UTC-3, calculado manualmente (sem depender do Intl do browser)
+    const BRT = -3 * 3600000;
+    const brt      = new Date(d.getTime()     + BRT);
+    const brtAgora = new Date(agora.getTime() + BRT);
+
+    const hh = String(brt.getUTCHours()).padStart(2,'0');
+    const mm = String(brt.getUTCMinutes()).padStart(2,'0');
+    const horaMin = hh + ':' + mm;
+
+    const diaD    = brt.toISOString().slice(0,10);
+    const diaHoje = brtAgora.toISOString().slice(0,10);
+    const diaOntem = new Date(brtAgora.getTime() - 86400000).toISOString().slice(0,10);
+
+    if (diaD === diaHoje)  return horaMin;
+    if (diaD === diaOntem) return 'ontem ' + horaMin;
+    return brt.toISOString().slice(8,10) + '/' + brt.toISOString().slice(5,7) + ' ' + horaMin;
   }
 
   // Atualiza "agora" → hora exata após 1 minuto
