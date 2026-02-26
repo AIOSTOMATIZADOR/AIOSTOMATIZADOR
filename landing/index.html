@@ -484,6 +484,44 @@
     }
     .return-divider::before, .return-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
 
+    /* ── Countdown ─────────────────────────────────────────── */
+    .countdown-box {
+      border: 1px solid rgba(239,68,68,0.3); border-radius: 8px;
+      padding: 24px 28px; margin-bottom: 48px;
+      background: rgba(239,68,68,0.04);
+      box-shadow: 0 0 30px rgba(239,68,68,0.08);
+    }
+    .cd-label {
+      font-family: 'Space Mono', monospace; font-size: 0.7rem;
+      letter-spacing: 2px; color: #ef4444; margin-bottom: 16px;
+    }
+    .cd-timer { display: flex; align-items: center; gap: 12px; }
+    .cd-unit { display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 60px; }
+    .cd-unit span {
+      font-family: 'Space Mono', monospace; font-size: clamp(1.8rem, 5vw, 2.8rem);
+      font-weight: 700; color: #ef4444; line-height: 1;
+    }
+    .cd-unit small { font-family: 'Space Mono', monospace; font-size: 0.6rem; color: var(--muted); letter-spacing: 2px; }
+    .cd-sep { font-family: 'Space Mono', monospace; font-size: 2rem; color: #ef4444; opacity: 0.5; align-self: flex-start; padding-top: 4px; }
+
+    /* Alarm effect */
+    @keyframes alarm-pulse { 0%,100%{background:var(--bg)} 50%{background:rgba(239,68,68,0.12)} }
+    @keyframes alarm-green { 0%,100%{background:var(--bg)} 50%{background:rgba(34,197,94,0.12)} }
+    .alarm-on  { animation: alarm-pulse 0.5s ease-in-out 6; }
+    .alarm-end { animation: alarm-green 1s ease-in-out 3; }
+
+    .fabrica-online {
+      display: none; text-align: center; padding: 40px 24px;
+      border: 1px solid var(--z4); border-radius: 8px;
+      background: rgba(34,197,94,0.06); margin-bottom: 48px;
+    }
+    .fabrica-online.on { display: block; }
+    .fabrica-online h2 {
+      font-family: 'Space Mono', monospace; font-size: clamp(1rem, 3vw, 1.6rem);
+      letter-spacing: 3px; color: var(--z4); margin-bottom: 10px;
+    }
+    .fabrica-online p { color: var(--muted); font-size: 0.9rem; }
+
     /* ── Chat Section ──────────────────────────────────────── */
     #chat-section { display: none; padding: 80px 0 0; }
     .chat-intro { margin-bottom: 48px; }
@@ -900,6 +938,26 @@
 
     <div class="divider"></div>
 
+    <!-- Countdown -->
+    <div class="countdown-box hud" id="countdown-box">
+      <div class="cd-label">// PRD_DEADLINE — a fábrica entra em produção em</div>
+      <div class="cd-timer">
+        <div class="cd-unit"><span id="cd-dias">00</span><small>dias</small></div>
+        <div class="cd-sep">:</div>
+        <div class="cd-unit"><span id="cd-horas">00</span><small>horas</small></div>
+        <div class="cd-sep">:</div>
+        <div class="cd-unit"><span id="cd-min">00</span><small>min</small></div>
+        <div class="cd-sep">:</div>
+        <div class="cd-unit"><span id="cd-seg">00</span><small>seg</small></div>
+      </div>
+    </div>
+
+    <!-- Fábrica online (aparece quando timer zera) -->
+    <div class="fabrica-online" id="fabrica-online">
+      <h2>// FÁBRICA ONLINE — MODO PRODUÇÃO ATIVADO</h2>
+      <p>O PRD foi concluído. A próxima fase começou.</p>
+    </div>
+
     <div class="chat-intro">
       <p class="sec-tag">// ideias.fabrica</p>
       <h2 class="sec-title">A fábrica é construída por todos.</h2>
@@ -1141,6 +1199,38 @@
   });
 
   carregar();
+
+  // ── Countdown ────────────────────────────────────────────────
+  const DEADLINE = new Date('2026-02-28T23:59:59-03:00');
+
+  function pad(n) { return String(n).padStart(2, '0'); }
+
+  function dispararAlarme() {
+    document.getElementById('countdown-box').style.display = 'none';
+    document.body.classList.add('alarm-on');
+    setTimeout(() => {
+      document.body.classList.remove('alarm-on');
+      document.body.classList.add('alarm-end');
+      document.getElementById('fabrica-online').classList.add('on');
+      setTimeout(() => document.body.classList.remove('alarm-end'), 3000);
+    }, 3000);
+  }
+
+  function atualizarCountdown() {
+    const diff = DEADLINE - Date.now();
+    if (diff <= 0) { dispararAlarme(); return; }
+    const dias  = Math.floor(diff / 86400000);
+    const horas = Math.floor((diff % 86400000) / 3600000);
+    const min   = Math.floor((diff % 3600000) / 60000);
+    const seg   = Math.floor((diff % 60000) / 1000);
+    document.getElementById('cd-dias').textContent  = pad(dias);
+    document.getElementById('cd-horas').textContent = pad(horas);
+    document.getElementById('cd-min').textContent   = pad(min);
+    document.getElementById('cd-seg').textContent   = pad(seg);
+  }
+
+  setInterval(atualizarCountdown, 1000);
+  atualizarCountdown();
 
   // ── Chat ─────────────────────────────────────────────────────
   let catAtual = 'ideias';
