@@ -1289,7 +1289,12 @@
     const texto = input.value.trim();
     if (!texto) return;
     input.value = '';
-    await db.from('mensagens').insert([{ nome: nomeUsuario(), cor: corUsuario(), categoria: catAtual, texto, votos: 0 }]);
+    const { data } = await db
+      .from('mensagens')
+      .insert([{ nome: nomeUsuario(), cor: corUsuario(), categoria: catAtual, texto, votos: 0 }])
+      .select()
+      .single();
+    if (data) adicionarMsgNaFeed(data);
   }
 
   function mostrarChat() {
