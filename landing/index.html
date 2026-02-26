@@ -1330,9 +1330,7 @@
         ${quotedHtml}
         <div class="msg-text">${msg.texto}</div>
         <div class="msg-actions">
-          <button class="btn-vote${(voted || proprio) ? ' voted' : ''}"
-            data-proprio="${proprio}"
-            ${proprio ? 'disabled title="Você não pode votar na própria ideia"' : ''}>
+          <button class="btn-vote ${voted ? 'voted' : ''}" data-id="${msg.id}" data-proprio="${proprio}">
             🔥 <span class="voto-count">${msg.votos}</span>
           </button>
           <button class="btn-reply" data-id="${msg.id}" data-nome="${msg.nome.split(' ')[0]}" data-texto="${msg.texto.substring(0,80).replace(/"/g,'&quot;').replace(/'/g,'&#39;')}">↩</button>
@@ -1426,15 +1424,25 @@
   }
 
   async function votar(id, btn) {
-    if (jaVotou(id) || btn.dataset.proprio === 'true' || btn.disabled) return;
+    if (btn.classList.contains('voted') || btn.dataset.proprio === 'true') return;
     registrarVoto(id);
     btn.classList.add('voted');
     const countEl = btn.querySelector('.voto-count');
     const novoCount = parseInt(countEl.textContent) + 1;
     countEl.textContent = novoCount;
-    const { error } = await db.from('mensagens').update({ votos: novoCount }).eq('id', id);
-    if (error) console.error('Erro ao votar:', error);
-    carregarTop(catAtual);
+    const { error } = await db
+      .from('mensagens')
+      .update({ votos: novoCount })
+      .eq('id', id);
+    if (error) {
+      console.error('Erro ao votar:', error);
+      const v = votosLocais().filter(x => x !== String(id));
+      localStorage.setItem('aios_votos', JSON.stringify(v));
+      btn.classList.remove('voted');
+      countEl.textContent = novoCount - 1;
+    } else {
+      carregarTop(catAtual);
+    }
   }
 
   async function enviarMensagem() {
