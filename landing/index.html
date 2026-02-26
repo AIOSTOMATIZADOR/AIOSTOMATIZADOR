@@ -1336,15 +1336,6 @@
           <button class="btn-reply" data-id="${msg.id}" data-nome="${msg.nome.split(' ')[0]}" data-texto="${msg.texto.substring(0,80).replace(/"/g,'&quot;').replace(/'/g,'&#39;')}">↩</button>
         </div>
       </div>`;
-    div.querySelector('.btn-vote').addEventListener('click', e => votar(msg.id, e.currentTarget));
-    div.querySelector('.btn-reply').addEventListener('click', e => {
-      const btn = e.currentTarget;
-      replyingTo = { id: btn.dataset.id, nome: btn.dataset.nome, texto: btn.dataset.texto };
-      document.getElementById('reply-nome').textContent  = replyingTo.nome;
-      document.getElementById('reply-texto').textContent = replyingTo.texto;
-      document.getElementById('reply-bar').classList.add('on');
-      document.getElementById('msg-input').focus();
-    });
     return div;
   }
 
@@ -1466,9 +1457,32 @@
     if (data) adicionarMsgNaFeed(data);
   }
 
+  let chatListenersReady = false;
+  function setupChatListeners() {
+    if (chatListenersReady) return;
+    chatListenersReady = true;
+    document.getElementById('messages-feed').addEventListener('click', e => {
+      const voteBtn = e.target.closest('.btn-vote');
+      if (voteBtn) {
+        const msgDiv = voteBtn.closest('[data-id]');
+        if (msgDiv) votar(msgDiv.dataset.id, voteBtn);
+        return;
+      }
+      const replyBtn = e.target.closest('.btn-reply');
+      if (replyBtn) {
+        replyingTo = { id: replyBtn.dataset.id, nome: replyBtn.dataset.nome, texto: replyBtn.dataset.texto };
+        document.getElementById('reply-nome').textContent  = replyingTo.nome;
+        document.getElementById('reply-texto').textContent = replyingTo.texto;
+        document.getElementById('reply-bar').classList.add('on');
+        document.getElementById('msg-input').focus();
+      }
+    });
+  }
+
   function mostrarChat() {
     const s = document.getElementById('chat-section');
     s.style.display = 'block';
+    setupChatListeners();
     carregarMensagens(catAtual);
     carregarTop(catAtual);
     subscreverChat();
