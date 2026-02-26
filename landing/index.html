@@ -1519,6 +1519,7 @@
     const payload = {
       nome: nomeUsuario(), cor: corUsuario(),
       categoria: catAtual, texto, votos: 0,
+      created_at: new Date().toISOString(),
       reply_to:      replyingTo ? replyingTo.id      : null,
       reply_nome:    replyingTo ? replyingTo.nome     : null,
       reply_preview: replyingTo ? replyingTo.texto    : null,
