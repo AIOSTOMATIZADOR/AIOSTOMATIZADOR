@@ -1175,7 +1175,10 @@
     div.dataset.id = msg.id;
     const cor = msg.cor || '#06b6d4';
     const ini = msg.nome.trim().split(' ').slice(0,2).map(n => n[0]).join('').toUpperCase();
-    const voted = jaVotou(msg.id);
+    const voted   = jaVotou(msg.id);
+    const proprio = msg.nome === nomeUsuario();
+    const voteBloq = voted || proprio;
+    const voteTitle = proprio ? 'Você não pode votar na própria ideia' : '';
     div.innerHTML = `
       <div class="msg-av" style="background:${cor}">${ini}</div>
       <div class="msg-body">
@@ -1185,7 +1188,7 @@
         </div>
         <div class="msg-text">${msg.texto}</div>
         <div class="msg-actions">
-          <button class="btn-vote${voted ? ' voted' : ''}" data-id="${msg.id}">
+          <button class="btn-vote${voteBloq ? ' voted' : ''}" data-id="${msg.id}" title="${voteTitle}" ${proprio ? 'disabled' : ''}>
             🔥 <span class="voto-count">${msg.votos}</span>
           </button>
         </div>
@@ -1219,23 +1222,26 @@
       </div>`).join('');
   }
 
-  function subscreverChat(cat) {
-    if (chatChannel) db.removeChannel(chatChannel);
-    chatChannel = db.channel('chat-' + cat)
+  function subscreverChat() {
+    if (chatChannel) return; // já inscrito, não duplica
+    chatChannel = db.channel('mensagens-live')
       .on('postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'mensagens', filter: `categoria=eq.${cat}` },
+        { event: 'INSERT', schema: 'public', table: 'mensagens' },
         p => {
+          if (p.new.categoria !== catAtual) return; // filtra no cliente
           const feed = document.getElementById('messages-feed');
           const empty = feed.querySelector('.msg-empty');
           if (empty) empty.remove();
           feed.appendChild(renderMsg(p.new));
           feed.scrollTop = feed.scrollHeight;
+          carregarTop(catAtual);
         }
       ).subscribe();
   }
 
   async function votar(id, msgEl) {
-    if (jaVotou(id)) return;
+    const nomeMsg = msgEl.querySelector('.msg-name')?.textContent;
+    if (jaVotou(id) || nomeMsg === nomeUsuario().split(' ')[0]) return;
     registrarVoto(id);
     const btn = msgEl.querySelector('.btn-vote');
     btn.classList.add('voted');
@@ -1259,7 +1265,7 @@
     s.style.display = 'block';
     carregarMensagens(catAtual);
     carregarTop(catAtual);
-    subscreverChat(catAtual);
+    subscreverChat();
     s.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
@@ -1270,7 +1276,7 @@
       catAtual = tab.dataset.cat;
       carregarMensagens(catAtual);
       carregarTop(catAtual);
-      subscreverChat(catAtual);
+      subscreverChat();
     });
   });
 
