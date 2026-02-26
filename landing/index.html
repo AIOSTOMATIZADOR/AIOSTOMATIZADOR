@@ -1426,7 +1426,7 @@
       .update({ votos: novoCount })
       .eq('id', id);
     if (error) {
-      console.error('Erro ao votar:', error);
+      alert('ERRO AO VOTAR:\n' + JSON.stringify(error, null, 2));
       const v = votosLocais().filter(x => x !== String(id));
       localStorage.setItem('aios_votos', JSON.stringify(v));
       btn.classList.remove('voted');
