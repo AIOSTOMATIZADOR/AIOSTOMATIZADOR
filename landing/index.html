@@ -646,6 +646,27 @@
     }
     .btn-send:hover { background: rgba(6,182,212,0.08); }
 
+    .btn-emoji {
+      padding: 14px 14px; background: transparent;
+      border: none; border-left: 1px solid var(--border);
+      font-size: 1.1rem; cursor: pointer; transition: background 0.2s;
+      position: relative;
+    }
+    .btn-emoji:hover { background: rgba(6,182,212,0.08); }
+    .emoji-picker {
+      display: none; position: absolute; bottom: calc(100% + 6px); right: 0;
+      background: #0d1f35; border: 1px solid var(--border);
+      border-radius: 10px; padding: 10px; z-index: 999;
+      display: grid; grid-template-columns: repeat(8, 1fr); gap: 2px;
+      width: 280px; box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+    }
+    .emoji-picker.hidden { display: none; }
+    .emoji-btn {
+      background: none; border: none; font-size: 1.3rem; cursor: pointer;
+      padding: 5px; border-radius: 6px; transition: background 0.15s; line-height: 1;
+    }
+    .emoji-btn:hover { background: rgba(255,255,255,0.1); }
+
     .chat-sidebar { background: rgba(0,212,255,0.03); border: 1px solid var(--border); border-radius: 8px; padding: 20px; position: sticky; top: 20px; }
     .sidebar-title { font-family: 'Space Mono', monospace; font-size: 0.7rem; letter-spacing: 2px; color: var(--z3); margin-bottom: 16px; }
     .top-empty { color: var(--muted); font-size: 0.8rem; text-align: center; padding: 20px 0; }
@@ -1084,8 +1105,16 @@
           <div class="reply-bar-text">↩ <strong id="reply-nome"></strong>: <span id="reply-texto"></span></div>
           <button class="reply-bar-close" id="reply-close">✕</button>
         </div>
-        <div class="chat-input-row">
+        <div class="chat-input-row" style="position:relative">
           <input type="text" id="msg-input" placeholder="Digite sua ideia aqui..." />
+          <button class="btn-emoji" id="btn-emoji" title="Emojis">😊
+            <div class="emoji-picker hidden" id="emoji-picker">
+              😀😂🥹😍🤩😎🥳🤔😅😭🤣😤🫡🤯😱🥶
+              ❤️🔥💡🚀✅💪🙌👏🫶👀🎯⚡🧠💻🛠️📌
+              🎉🙏🤝💯🫂🌟💥🎮🏆🧩🎲📢📣🔔💬🗣️
+              👾🤖🦾🧬🌍🌈☀️🌙⭐🍕🎵🎶🎤🎸🎺🥁
+            </div>
+          </button>
           <button class="btn-send" id="btn-send">ENVIAR ⚡</button>
         </div>
       </div>
@@ -1576,6 +1605,40 @@
 
   document.getElementById('btn-send').addEventListener('click', enviarMensagem);
   document.getElementById('msg-input').addEventListener('keydown', e => { if (e.key === 'Enter') enviarMensagem(); });
+
+  // Emoji picker
+  const emojiPicker = document.getElementById('emoji-picker');
+  const btnEmoji    = document.getElementById('btn-emoji');
+  const msgInput    = document.getElementById('msg-input');
+
+  btnEmoji.addEventListener('click', e => {
+    e.stopPropagation();
+    emojiPicker.classList.toggle('hidden');
+  });
+
+  // Converte os emojis (texto) em botões clicáveis
+  const rawText = emojiPicker.textContent;
+  emojiPicker.innerHTML = '';
+  [...rawText.trim()].forEach(ch => {
+    if (ch.trim() === '') return;
+    const btn = document.createElement('button');
+    btn.className = 'emoji-btn';
+    btn.textContent = ch;
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      const start = msgInput.selectionStart;
+      const end   = msgInput.selectionEnd;
+      const val   = msgInput.value;
+      msgInput.value = val.slice(0, start) + ch + val.slice(end);
+      msgInput.selectionStart = msgInput.selectionEnd = start + ch.length;
+      msgInput.focus();
+      emojiPicker.classList.add('hidden');
+    });
+    emojiPicker.appendChild(btn);
+  });
+
+  // Fecha ao clicar fora
+  document.addEventListener('click', () => emojiPicker.classList.add('hidden'));
   document.getElementById('reply-close').addEventListener('click', () => {
     replyingTo = null;
     document.getElementById('reply-bar').classList.remove('on');
