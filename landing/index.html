@@ -1415,6 +1415,7 @@
   }
 
   async function votar(id, btn) {
+    alert('clicou! id=' + id + ' | proprio=' + btn.dataset.proprio + ' | voted=' + btn.classList.contains('voted'));
     if (btn.classList.contains('voted') || btn.dataset.proprio === 'true') return;
     registrarVoto(id);
     btn.classList.add('voted');
