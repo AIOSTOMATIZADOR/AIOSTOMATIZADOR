@@ -1294,10 +1294,13 @@
   function jaVotou(id) { return votosLocais().includes(id); }
 
   function tempoRelativo(ts) {
-    // Garante interpretação UTC (Supabase retorna sem 'Z' às vezes)
-    const str = String(ts).replace(' ', 'T');
-    const date = new Date(str.endsWith('Z') || str.includes('+') ? str : str + 'Z');
-    const diff = Math.floor((Date.now() - date) / 1000);
+    // Normaliza qualquer formato do Supabase para ISO 8601 válido
+    let str = String(ts)
+      .replace(' ', 'T')        // "2026-02-26 20:00" → "2026-02-26T20:00"
+      .replace(/\+00$/, 'Z')    // "+00" → "Z"
+      .replace(/\+00:00$/, 'Z');// "+00:00" → "Z"
+    if (!str.endsWith('Z') && !str.match(/[+-]\d{2}:\d{2}$/)) str += 'Z';
+    const diff = Math.floor((Date.now() - new Date(str)) / 1000);
     if (diff < 120) return 'agora';
     if (diff < 3600) return Math.floor(diff / 60) + 'min';
     if (diff < 86400) return Math.floor(diff / 3600) + 'h';
@@ -1310,10 +1313,8 @@
     div.dataset.id = msg.id;
     const cor = msg.cor || '#06b6d4';
     const ini = msg.nome.trim().split(' ').slice(0,2).map(n => n[0]).join('').toUpperCase();
-    const voted    = jaVotou(msg.id);
-    const proprio  = msg.nome === nomeUsuario();
-    const voteBloq = voted || proprio;
-    const voteTitle = proprio ? 'Você não pode votar na própria ideia' : '';
+    const voted   = jaVotou(msg.id);
+    const proprio = msg.nome === nomeUsuario();
     const quotedHtml = msg.reply_preview ? `
       <div class="quoted-msg">
         <div class="quoted-nome">↩ ${msg.reply_nome || ''}</div>
@@ -1329,13 +1330,15 @@
         ${quotedHtml}
         <div class="msg-text">${msg.texto}</div>
         <div class="msg-actions">
-          <button class="btn-vote${voteBloq ? ' voted' : ''}" data-id="${msg.id}" title="${voteTitle}" ${proprio ? 'disabled' : ''}>
+          <button class="btn-vote${(voted || proprio) ? ' voted' : ''}"
+            data-proprio="${proprio}"
+            ${proprio ? 'disabled title="Você não pode votar na própria ideia"' : ''}>
             🔥 <span class="voto-count">${msg.votos}</span>
           </button>
           <button class="btn-reply" data-id="${msg.id}" data-nome="${msg.nome.split(' ')[0]}" data-texto="${msg.texto.substring(0,80).replace(/"/g,'&quot;').replace(/'/g,'&#39;')}">↩</button>
         </div>
       </div>`;
-    div.querySelector('.btn-vote').addEventListener('click', () => votar(msg.id, div));
+    div.querySelector('.btn-vote').addEventListener('click', e => votar(msg.id, e.currentTarget));
     div.querySelector('.btn-reply').addEventListener('click', e => {
       const btn = e.currentTarget;
       replyingTo = { id: btn.dataset.id, nome: btn.dataset.nome, texto: btn.dataset.texto };
@@ -1422,16 +1425,15 @@
     }, 3000);
   }
 
-  async function votar(id, msgEl) {
-    const nomeMsg = msgEl.querySelector('.msg-name')?.textContent;
-    if (jaVotou(id) || nomeMsg === nomeUsuario().split(' ')[0]) return;
+  async function votar(id, btn) {
+    if (jaVotou(id) || btn.dataset.proprio === 'true' || btn.disabled) return;
     registrarVoto(id);
-    const btn = msgEl.querySelector('.btn-vote');
     btn.classList.add('voted');
     const countEl = btn.querySelector('.voto-count');
     const novoCount = parseInt(countEl.textContent) + 1;
     countEl.textContent = novoCount;
-    await db.from('mensagens').update({ votos: novoCount }).eq('id', id);
+    const { error } = await db.from('mensagens').update({ votos: novoCount }).eq('id', id);
+    if (error) console.error('Erro ao votar:', error);
     carregarTop(catAtual);
   }
 
