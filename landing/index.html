@@ -1314,7 +1314,7 @@
     const cor = msg.cor || '#06b6d4';
     const ini = msg.nome.trim().split(' ').slice(0,2).map(n => n[0]).join('').toUpperCase();
     const voted   = jaVotou(msg.id);
-    const proprio = msg.nome === nomeUsuario();
+    const proprio = msg.nome.trim().toLowerCase() === nomeUsuario().trim().toLowerCase();
     const quotedHtml = msg.reply_preview ? `
       <div class="quoted-msg">
         <div class="quoted-nome">↩ ${msg.reply_nome || ''}</div>
@@ -1330,8 +1330,8 @@
         ${quotedHtml}
         <div class="msg-text">${msg.texto}</div>
         <div class="msg-actions">
-          <button class="btn-vote ${voted ? 'voted' : ''}" data-id="${msg.id}" data-proprio="${proprio}">
-            🔥 <span class="voto-count">${msg.votos}</span>
+          <button class="btn-vote ${(voted || proprio) ? 'voted' : ''}" data-id="${msg.id}" data-proprio="${proprio}" ${proprio ? 'title="Você não pode votar na própria ideia" style="opacity:0.4;cursor:not-allowed"' : ''}>
+            🔥 <span class="voto-count">${msg.votos || 0}</span>
           </button>
           <button class="btn-reply" data-id="${msg.id}" data-nome="${msg.nome.split(' ')[0]}" data-texto="${msg.texto.substring(0,80).replace(/"/g,'&quot;').replace(/'/g,'&#39;')}">↩</button>
         </div>
@@ -1428,7 +1428,7 @@
     registrarVoto(id);
     btn.classList.add('voted');
     const countEl = btn.querySelector('.voto-count');
-    const novoCount = parseInt(countEl.textContent) + 1;
+    const novoCount = (parseInt(countEl.textContent) || 0) + 1;
     countEl.textContent = novoCount;
     const { error } = await db
       .from('mensagens')
