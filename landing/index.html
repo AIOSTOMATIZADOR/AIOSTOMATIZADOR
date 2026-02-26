@@ -1348,7 +1348,9 @@
 
   function tempoRelativo(ts) {
     const d = parseTS(ts);
-    if (isNaN(d.getTime())) return '?';
+    if (isNaN(d.getTime())) return '[ERRO:' + ts + ']';
+    // DEBUG: mostra raw + parsed UTC + BRT
+    return '[RAW:' + String(ts).slice(11,19) + ' | UTC:' + d.toISOString().slice(11,19) + ' | BRT:' + d.toLocaleTimeString('pt-BR',{timeZone:TZ,hour:'2-digit',minute:'2-digit'}) + ']';
     const agora = new Date();
     if ((agora - d) < 60000) return 'agora';
     const horaMin = d.toLocaleTimeString('pt-BR', { timeZone: TZ, hour: '2-digit', minute: '2-digit' });
