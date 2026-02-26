@@ -1091,6 +1091,12 @@
   const { createClient } = supabase;
   const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 
+  // Reset votos do localStorage via URL ?resetvotos
+  if (window.location.search.includes('resetvotos')) {
+    localStorage.removeItem('aios_votos');
+    window.location.replace(window.location.pathname);
+  }
+
   // ── Cores das zonas ──────────────────────────────────────────
   const zoneCores = ['#ef4444','#f97316','#eab308','#22c55e','#3b82f6','#a855f7','#ec4899','#06b6d4'];
   const coreNomes = {
@@ -1313,6 +1319,10 @@
     div.dataset.id = msg.id;
     const cor = msg.cor || '#06b6d4';
     const ini = msg.nome.trim().split(' ').slice(0,2).map(n => n[0]).join('').toUpperCase();
+    // Se localStorage diz "votou" mas o banco tem 0 votos = voto fantasma, limpa
+    if (jaVotou(msg.id) && (msg.votos || 0) === 0) {
+      localStorage.setItem('aios_votos', JSON.stringify(votosLocais().filter(x => x !== String(msg.id))));
+    }
     const voted   = jaVotou(msg.id);
     const proprio = msg.nome.trim().toLowerCase() === nomeUsuario().trim().toLowerCase();
     const quotedHtml = msg.reply_preview ? `
@@ -1415,7 +1425,6 @@
   }
 
   async function votar(id, btn) {
-    alert('clicou! id=' + id + ' | proprio=' + btn.dataset.proprio + ' | voted=' + btn.classList.contains('voted'));
     if (btn.classList.contains('voted') || btn.dataset.proprio === 'true') return;
     registrarVoto(id);
     btn.classList.add('voted');
@@ -1427,7 +1436,7 @@
       .update({ votos: novoCount })
       .eq('id', id);
     if (error) {
-      alert('ERRO AO VOTAR:\n' + JSON.stringify(error, null, 2));
+      console.error('Erro ao votar:', error);
       const v = votosLocais().filter(x => x !== String(id));
       localStorage.setItem('aios_votos', JSON.stringify(v));
       btn.classList.remove('voted');
