@@ -865,10 +865,8 @@
       p => adicionarNome(p.new.nome, p.new.cor_escolhida)
     ).subscribe();
 
-  // ── Zona toggle ──────────────────────────────────────────────
-  document.getElementById('zona-radio').addEventListener('change', e => {
-    document.getElementById('zona-campo').classList.toggle('visible', e.target.value === 'sim');
-  });
+  // ── Zona toggle (apenas registra a escolha, sem caixa de texto) ──
+  // (campo removido — apenas radio buttons)
 
   // ── Color picker ─────────────────────────────────────────────
   document.querySelectorAll('.color-swatch').forEach(swatch => {
@@ -900,7 +898,6 @@
     const nome          = document.getElementById('nome').value.trim();
     const email         = document.getElementById('email').value.trim();
     const temZona       = document.querySelector('input[name="tem_zona"]:checked')?.value;
-    const zonaTexto     = document.getElementById('zona_texto').value.trim();
     const cor_escolhida = document.getElementById('cor_escolhida').value || null;
     const periodo_dia   = [...document.querySelectorAll('.periodo:checked')].map(el => el.value);
     const dias_semana   = [...document.querySelectorAll('.diasemana:checked')].map(el => el.value);
@@ -919,8 +916,7 @@
 
     const { error } = await db.from('inscricoes').insert([{
       nome, email,
-      tem_zona_genialidade:  temZona === 'sim',
-      zona_genialidade_texto: zonaTexto || null,
+      tem_zona_genialidade: temZona === 'sim',
       cor_escolhida,
       periodo_dia: periodo_dia.length ? periodo_dia : null,
       dias_semana:  dias_semana.length  ? dias_semana  : null
