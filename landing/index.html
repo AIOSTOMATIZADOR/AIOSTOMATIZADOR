@@ -412,7 +412,9 @@
     .check-group-7 .check-opt span { font-size: 0.75rem; }
 
     /* Color picker */
-    .color-picker { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 4px; }
+    .color-picker { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 4px; }
+    .swatch-item { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+    .swatch-nome { font-family: 'Space Mono', monospace; font-size: 0.6rem; letter-spacing: 0.3px; opacity: 0.75; text-align: center; }
     .color-swatch {
       width: 38px; height: 38px; border-radius: 50%; cursor: pointer;
       border: 2px solid transparent;
@@ -698,22 +700,41 @@
           </div>
         </div>
 
-        <div class="field zona-campo" id="zona-campo">
-          <label>GENIUS_ZONE_DATA <span class="hint"> — vai pré-carregar seu perfil</span></label>
-          <textarea id="zona_texto" placeholder="Cole ou escreva sua zona de genialidade aqui..."></textarea>
-        </div>
-
         <div class="field">
-          <label>SUA_COR <span class="hint"> &nbsp;— escolha a cor que vai te representar na fábrica</span></label>
+          <label>SUA_COR <span class="hint"> &nbsp;— escolha a cor que mais combine com você no momento</span></label>
           <div class="color-picker" id="color-picker">
-            <div class="color-swatch" data-cor="#ef4444" style="background:#ef4444" title="Vermelho"></div>
-            <div class="color-swatch" data-cor="#f97316" style="background:#f97316" title="Laranja"></div>
-            <div class="color-swatch" data-cor="#eab308" style="background:#eab308" title="Dourado"></div>
-            <div class="color-swatch" data-cor="#22c55e" style="background:#22c55e" title="Verde"></div>
-            <div class="color-swatch" data-cor="#3b82f6" style="background:#3b82f6" title="Azul"></div>
-            <div class="color-swatch" data-cor="#a855f7" style="background:#a855f7" title="Roxo"></div>
-            <div class="color-swatch" data-cor="#ec4899" style="background:#ec4899" title="Rosa"></div>
-            <div class="color-swatch" data-cor="#06b6d4" style="background:#06b6d4" title="Ciano"></div>
+            <div class="swatch-item">
+              <div class="color-swatch" data-cor="#ef4444" style="background:#ef4444"></div>
+              <span class="swatch-nome" style="color:#ef4444">Estrategista</span>
+            </div>
+            <div class="swatch-item">
+              <div class="color-swatch" data-cor="#f97316" style="background:#f97316"></div>
+              <span class="swatch-nome" style="color:#f97316">Criativo</span>
+            </div>
+            <div class="swatch-item">
+              <div class="color-swatch" data-cor="#eab308" style="background:#eab308"></div>
+              <span class="swatch-nome" style="color:#eab308">Comunicador</span>
+            </div>
+            <div class="swatch-item">
+              <div class="color-swatch" data-cor="#22c55e" style="background:#22c55e"></div>
+              <span class="swatch-nome" style="color:#22c55e">Construtor</span>
+            </div>
+            <div class="swatch-item">
+              <div class="color-swatch" data-cor="#3b82f6" style="background:#3b82f6"></div>
+              <span class="swatch-nome" style="color:#3b82f6">Analista</span>
+            </div>
+            <div class="swatch-item">
+              <div class="color-swatch" data-cor="#a855f7" style="background:#a855f7"></div>
+              <span class="swatch-nome" style="color:#a855f7">Visionário</span>
+            </div>
+            <div class="swatch-item">
+              <div class="color-swatch" data-cor="#ec4899" style="background:#ec4899"></div>
+              <span class="swatch-nome" style="color:#ec4899">Conector</span>
+            </div>
+            <div class="swatch-item">
+              <div class="color-swatch" data-cor="#06b6d4" style="background:#06b6d4"></div>
+              <span class="swatch-nome" style="color:#06b6d4">Executor</span>
+            </div>
           </div>
           <input type="hidden" id="cor_escolhida" value="" />
           <div class="cor-preview" id="cor-preview">
