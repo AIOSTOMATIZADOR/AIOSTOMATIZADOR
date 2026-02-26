@@ -1350,7 +1350,6 @@
     const d = parseTS(ts);
     if (isNaN(d.getTime())) return '?';
     const agora = new Date();
-    if ((agora - d) < 60000) return 'agora';
 
     // BRT = UTC-3, calculado manualmente (sem depender do Intl do browser)
     const BRT = -3 * 3600000;
@@ -1361,8 +1360,8 @@
     const mm = String(brt.getUTCMinutes()).padStart(2,'0');
     const horaMin = hh + ':' + mm;
 
-    const diaD    = brt.toISOString().slice(0,10);
-    const diaHoje = brtAgora.toISOString().slice(0,10);
+    const diaD     = brt.toISOString().slice(0,10);
+    const diaHoje  = brtAgora.toISOString().slice(0,10);
     const diaOntem = new Date(brtAgora.getTime() - 86400000).toISOString().slice(0,10);
 
     if (diaD === diaHoje)  return horaMin;
