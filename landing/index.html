@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AIOSTOMATIZADOR — A fábrica de execução com Jarvis</title>
+  <title>AIOXSTOMATIZADOR — A fábrica de execução com Jarvis</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
@@ -826,7 +826,7 @@
 
 <!-- Boot screen -->
 <div id="boot">
-  <div class="boot-logo">AIOSTOMATIZADOR</div>
+  <div class="boot-logo">AIOXSTOMATIZADOR</div>
   <div class="boot-line" id="b1">// SYSTEM INITIALIZING...</div>
   <div class="boot-line" id="b2">// LOADING GENIUS ZONES... OK</div>
   <div class="boot-line" id="b3">// CONNECTING JARVIS CORE... OK</div>
@@ -846,7 +846,7 @@
 
   <!-- Nav -->
   <nav>
-    <div class="logo">AIOSTOMATIZADOR</div>
+    <div class="logo">AIOXSTOMATIZADOR</div>
     <div class="sys-status">
       <span class="status-dot"></span>
       SISTEMA ONLINE
@@ -863,7 +863,7 @@
     </h1>
     <p class="hero-sub">
       Uma legião em execução. Uma IA que executa tudo. Projetos saindo do papel em apenas um dia — às vezes, em horas, até mesmo em alguns minutos.
-      O <strong>AIOSTOMATIZADOR</strong> é a fábrica onde você entra com
+      O <strong>AIOXSTOMATIZADOR</strong> é a fábrica onde você entra com
       seu talento e sai com resultados reais — no seu tempo, no seu superpoder.
     </p>
     <a href="#formulario" class="hero-cta">
@@ -942,7 +942,7 @@
       <span class="card-icon">⚡</span>
       <div class="card-zone" style="color:var(--z3)">// módulo 03</div>
       <h3>Execução, não papo</h3>
-      <p>Chega de grupo no WhatsApp cheio de ideia e zero entrega. O AIOS delega, organiza e executa. Você aparece e cresce.</p>
+      <p>Chega de grupo no WhatsApp cheio de ideia e zero entrega. O AIOX delega, organiza e executa. Você aparece e cresce.</p>
     </div>
     <div class="card c4 hud">
       <div class="card-top-left"></div>
@@ -1134,7 +1134,7 @@
     <div class="chat-intro">
       <p class="sec-tag">// ideias.fabrica</p>
       <h2 class="sec-title">A fábrica é construída por todos.</h2>
-      <p class="sec-sub">Aqui você contribui com ideias para moldar como o AIOSTOMATIZADOR vai funcionar. Cada voz importa — as ideias mais votadas sobem para o topo.</p>
+      <p class="sec-sub">Aqui você contribui com ideias para moldar como o AIOXSTOMATIZADOR vai funcionar. Cada voz importa — as ideias mais votadas sobem para o topo.</p>
 
       <div class="cat-legend">
         <div class="cat-legend-item">
@@ -1263,7 +1263,7 @@
           <div class="battle-suggest hud">
             <div class="battle-suggest-title">💡 SUGIRA UM NOME</div>
             <input class="battle-input" id="nome-input" maxlength="40"
-                   placeholder="ex: Nexus, Orion, AIOS..."
+                   placeholder="ex: Nexus, Orion, AIOX..."
                    onkeydown="if(event.key==='Enter') sugerirNome()" />
             <button class="battle-submit" onclick="sugerirNome()">ENVIAR SUGESTÃO ⚡</button>
           </div>
@@ -1289,7 +1289,7 @@
 
 <footer>
   <div class="container">
-    <p>BUILT_BY: humanos + <strong>AIOS</strong> &nbsp;|&nbsp; AIOSTOMATIZADOR © 2026 &nbsp;|&nbsp; STATUS: <span style="color:var(--z4)">ONLINE</span></p>
+    <p>BUILT_BY: humanos + <strong>AIOX</strong> &nbsp;|&nbsp; AIOXSTOMATIZADOR © 2026 &nbsp;|&nbsp; STATUS: <span style="color:var(--z4)">ONLINE</span></p>
   </div>
 </footer>
 
@@ -1802,10 +1802,6 @@
   });
 
   // ── Battle de Nomes ──────────────────────────────────────────
-  let batalhasVotadas = JSON.parse(localStorage.getItem('battle_votos') || '[]');
-
-  function parKey(a, b) { return [String(a), String(b)].sort().join('|'); }
-
   function renderRankingNomes(nomes) {
     const el = document.getElementById('battle-ranking');
     if (!nomes || nomes.length === 0) {
@@ -1845,22 +1841,9 @@
       return;
     }
 
+    // Escolhe 2 aleatórios — sem deduplicação, nomes populares continuam aparecendo
     const shuffled = [...nomes].sort(() => Math.random() - 0.5);
-    let par = null;
-    outer: for (let i = 0; i < shuffled.length; i++) {
-      for (let j = i + 1; j < shuffled.length; j++) {
-        if (!batalhasVotadas.includes(parKey(shuffled[i].id, shuffled[j].id))) {
-          par = [shuffled[i], shuffled[j]];
-          break outer;
-        }
-      }
-    }
-    if (!par) {
-      batalhasVotadas = [];
-      localStorage.setItem('battle_votos', '[]');
-      par = [shuffled[0], shuffled[1]];
-    }
-    renderBattle(par[0], par[1]);
+    renderBattle(shuffled[0], shuffled[1]);
   }
 
   async function votarBattle(vencedorId, perdedorId, lado, vitorias) {
@@ -1868,15 +1851,9 @@
     const pBtn = document.getElementById('battle-' + (lado === 'a' ? 'b' : 'a'));
     if (!vBtn || !pBtn) return;
 
-    // Bloqueia cliques duplos
     vBtn.onclick = null; pBtn.onclick = null;
-
     vBtn.classList.add('battle-winner');
     pBtn.classList.add('battle-loser');
-
-    const key = parKey(vencedorId, perdedorId);
-    batalhasVotadas.push(key);
-    localStorage.setItem('battle_votos', JSON.stringify(batalhasVotadas));
 
     await db.from('nome_sugestoes').update({ vitorias: vitorias + 1 }).eq('id', vencedorId);
 
