@@ -1062,17 +1062,11 @@
       </div>
     </div>
 
-    <!-- Countdown -->
-    <div class="countdown-box hud" id="countdown-box">
-      <div class="cd-label">// PRD_DEADLINE — a fábrica entra em produção em</div>
-      <div class="cd-timer">
-        <div class="cd-unit"><span id="cd-dias">00</span><small>dias</small></div>
-        <div class="cd-sep">:</div>
-        <div class="cd-unit"><span id="cd-horas">00</span><small>horas</small></div>
-        <div class="cd-sep">:</div>
-        <div class="cd-unit"><span id="cd-min">00</span><small>min</small></div>
-        <div class="cd-sep">:</div>
-        <div class="cd-unit"><span id="cd-seg">00</span><small>seg</small></div>
+    <!-- Countdown congelado -->
+    <div class="countdown-box hud" id="countdown-box" style="text-align:center; padding: 24px 32px;">
+      <div class="cd-label" style="font-size:1.1rem; letter-spacing:3px; margin-bottom:12px;">🌀 TEMPO SUSPENSO</div>
+      <div style="color: var(--muted); font-size: 0.88rem; max-width: 480px; margin: 0 auto; line-height: 1.6;">
+        Uma legião de pessoas usando AIOX juntas no mesmo projeto causou uma dobra no espaço-tempo.
       </div>
     </div>
 
@@ -1331,8 +1325,7 @@
     document.getElementById('cd-seg').textContent   = pad(seg);
   }
 
-  setInterval(atualizarCountdown, 1000);
-  atualizarCountdown();
+  // Timer congelado — countdown desativado
 
   // ── Chat ─────────────────────────────────────────────────────
   let catAtual = 'ideias';
