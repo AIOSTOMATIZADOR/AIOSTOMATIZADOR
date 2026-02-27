@@ -484,24 +484,42 @@
     }
     .return-divider::before, .return-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
 
-    /* ── Countdown ─────────────────────────────────────────── */
+    /* ── Countdown (congelado) ──────────────────────────────── */
     .countdown-box {
-      border: 1px solid rgba(239,68,68,0.3); border-radius: 8px;
+      border: 1px solid rgba(147,210,255,0.4); border-radius: 8px;
       padding: 24px 28px; margin-bottom: 48px;
-      background: rgba(239,68,68,0.04);
-      box-shadow: 0 0 30px rgba(239,68,68,0.08);
+      background: rgba(147,210,255,0.04);
+      box-shadow: 0 0 40px rgba(147,210,255,0.15), 0 0 80px rgba(96,165,250,0.08);
+      position: relative; overflow: hidden;
+    }
+    /* cristais de gelo nos cantos */
+    .countdown-box::before, .countdown-box::after {
+      content: '❄'; position: absolute;
+      font-size: 2.5rem; opacity: 0.15;
+      animation: ice-drift 4s ease-in-out infinite;
+    }
+    .countdown-box::before { top: 6px; left: 10px; animation-delay: 0s; }
+    .countdown-box::after  { bottom: 6px; right: 10px; animation-delay: 2s; }
+    @keyframes ice-drift {
+      0%,100% { opacity: 0.12; transform: scale(1) rotate(0deg); }
+      50%      { opacity: 0.22; transform: scale(1.1) rotate(15deg); }
     }
     .cd-label {
       font-family: 'Space Mono', monospace; font-size: 0.7rem;
-      letter-spacing: 2px; color: #ef4444; margin-bottom: 16px;
+      letter-spacing: 2px; color: #93d2ff; margin-bottom: 16px;
     }
     .cd-timer { display: flex; align-items: center; gap: 12px; }
     .cd-unit { display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 60px; }
     .cd-unit span {
       font-family: 'Space Mono', monospace; font-size: clamp(1.8rem, 5vw, 2.8rem);
-      font-weight: 700; color: #ef4444; line-height: 1;
+      font-weight: 700; color: #93d2ff; line-height: 1;
+      text-shadow: 0 0 18px rgba(147,210,255,0.6), 0 0 40px rgba(96,165,250,0.3);
     }
-    .cd-unit small { font-family: 'Space Mono', monospace; font-size: 0.6rem; color: var(--muted); letter-spacing: 2px; }
+    .cd-unit small { font-family: 'Space Mono', monospace; font-size: 0.6rem; color: #93d2ff; letter-spacing: 2px; opacity: 0.6; }
+    .cd-frozen-msg {
+      font-size: 0.78rem; color: rgba(147,210,255,0.6);
+      margin-top: 14px; font-style: italic; letter-spacing: 0.5px;
+    }
     .cd-sep { font-family: 'Space Mono', monospace; font-size: 2rem; color: #ef4444; opacity: 0.5; align-self: flex-start; padding-top: 4px; }
 
     /* Alarm effect */
@@ -1063,9 +1081,18 @@
     </div>
 
     <!-- Countdown congelado -->
-    <div class="countdown-box hud" id="countdown-box" style="text-align:center; padding: 24px 32px;">
-      <div class="cd-label" style="font-size:1.1rem; letter-spacing:3px; margin-bottom:12px;">🌀 TEMPO SUSPENSO</div>
-      <div style="color: var(--muted); font-size: 0.88rem; max-width: 480px; margin: 0 auto; line-height: 1.6;">
+    <div class="countdown-box hud" id="countdown-box">
+      <div class="cd-label">❄️ TEMPO_CONGELADO</div>
+      <div class="cd-timer">
+        <div class="cd-unit"><span>00</span><small>dias</small></div>
+        <div class="cd-sep">:</div>
+        <div class="cd-unit"><span>13</span><small>horas</small></div>
+        <div class="cd-sep">:</div>
+        <div class="cd-unit"><span>03</span><small>min</small></div>
+        <div class="cd-sep">:</div>
+        <div class="cd-unit"><span>38</span><small>seg</small></div>
+      </div>
+      <div class="cd-frozen-msg">
         Uma legião de pessoas usando AIOX juntas no mesmo projeto causou uma dobra no espaço-tempo.
       </div>
     </div>
